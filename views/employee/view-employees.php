@@ -1,0 +1,121 @@
+<?php include BASE_PATH . "views/layout/components/quick-access.php"; ?>
+
+
+<?php
+$employees = $employees ?? [];
+$totalRecordsCount = $totalRecordsCount ?? 0;
+$currentPage = $currentPage ?? 1;
+$totalPages = $totalPages ?? 1;
+$paginationError = $paginationError ?? null;
+$deleteSuccess = $_SESSION['employeeDeleteSuccess'] ?? null;
+$deleteError = $_SESSION['employeeDeleteError'] ?? null;
+
+unset($_SESSION['employeeDeleteSuccess']);
+unset($_SESSION['employeeDeleteError']);
+?>
+<div class="content-frame">
+  <div class="table-container">
+    <div class="table-header">
+      <div class="table-heading">
+        <h3>Employees</h3>
+      </div>
+      <div class="table-actions">
+        <div class="search-bar">
+          <input type="text" placeholder="Search Employee" name="table-search" id="table-search" />
+        </div>
+        <div class="filter-bar">
+          <select id="status-filter">
+            <option value="all">All</option>
+            <option value="dev">Dev</option>
+            <option value="designer">Designer</option>
+            <option value="hr">HR</option>
+            <option value="manager">Manager</option>
+            <option value="service-manager">Service Manager</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="table">
+      <!-- delete success message -->
+      <?php if (!empty($deleteSuccess)): ?>
+        <div class="success-message">
+          <p><?= htmlspecialchars($deleteSuccess); ?></p>
+        </div>
+      <?php endif; ?>
+      <!-- delete error message -->
+      <?php if (!empty($deleteError)): ?>
+        <div class="error-message">
+          <p><?= htmlspecialchars($deleteError); ?></p>
+        </div>
+      <?php endif; ?>
+      <table>
+        <thead>
+          <tr>
+            <th id="table-primary-id">EMPLOYEE ID</th>
+            <th>NAME</th>
+            <th>DESIGNATION</th>
+            <th>MOBILE NO</th>
+            <th>EMAIL ID</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <?php if (!empty($employees)): ?>
+            <?php foreach ($employees as $emp): ?>
+              <tr>
+                <td><?= htmlspecialchars($emp["emp_id"]); ?></td>
+                <td><?= htmlspecialchars($emp["name"]); ?></td>
+                <td><?= htmlspecialchars($emp["designation"]); ?></td>
+                <td><?= htmlspecialchars($emp["phone"]); ?></td>
+                <td><?= htmlspecialchars($emp["email"]); ?></td>
+                <td>
+                  <a href="<?= BASE_URL ?>employee/update?id=<?= $emp['emp_id']; ?>"><button class="edit-button">Edit</button></a>
+                  <a href="<?= BASE_URL ?>employee/delete?id=<?= $emp['emp_id']; ?>"><button class="delete-button">Delete</button>
+                  </a>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <tr>
+              <td colspan="6" style="text-align:center;">No employee records found.</td>
+            </tr>
+          <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-footer">
+      <?php if (!empty($paginationError)): ?>
+        <div class="error-message">
+          <p><?= htmlspecialchars($paginationError); ?></p>
+        </div>
+      <?php endif; ?>
+      <div class="pagination">
+        <span>Rows per page: 10</span>
+        <span>
+          <?php
+          $limit = 10;
+          $offset = ($currentPage - 1) * $limit;
+
+          if ($totalRecordsCount === 0) {
+            echo "0-0 of 0";
+          } else {
+            $from = $offset + 1;
+            $to = min($offset + $limit, $totalRecordsCount);
+            echo "$from-$to of $totalRecordsCount";
+          }
+          ?>
+        </span>
+        <div class="pagination-buttons">
+          <button class="<?= $currentPage <= 1 ? 'btn disabled' : 'btn-primary' ?>" <?= $currentPage <= 1 ? 'disabled' : '' ?>
+            onclick="window.location.href='<?= BASE_URL ?>employee/view?page=<?= $currentPage - 1 ?>'">←
+            Previous</button>
+          <button class="<?= $currentPage >= $totalPages ? 'btn disabled' : 'btn-primary ' ?>" <?= $currentPage >= $totalPages ? 'disabled' : '' ?>
+            onclick="window.location.href='<?= BASE_URL ?>employee/view?page=<?= $currentPage + 1 ?>'">Next
+            →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

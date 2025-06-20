@@ -1,0 +1,48 @@
+- Dashboard
+- Employee Management
+  - Create Employee
+  - View Employees
+- Asset Management
+  - Create Asset
+  - View Assets
+  - Categories
+- Asset Allocation
+  - Allocate Asset
+  - Deallocate Asset
+  - Allocation History
+- Reports
+  - Employee Asset Report
+  - Asset Status Report
+- Settings
+  - User Management
+  - App Settings
+
+
+
+Dashboard
+{
+
+🔍 EDA-Based Features for Asset Management
+| **Feature Name**                         | **Description**                                                                                                                      |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **Assets by Status**                     | Bar/Pie chart showing how many assets are in each status: *Available, Assigned, Under Maintenance*. Useful to monitor overall stock. |
+| **Assets Allocated Over Time**           | Line graph of how many assets were assigned each month. Great for visualizing usage trends.                                          |
+| **Employee Distribution by Designation** | Pie chart showing number of employees grouped by designation (Manager, Employee, Intern). Helps HR & resource planning.              |
+| **Aging Assets**                         | List of assets older than a certain age (e.g., 3 years). Useful for identifying assets due for replacement or warranty expiration.   |
+| **Issue Trend Over Time**                | Line/bar chart showing number of issues reported month-by-month. Reveals spikes in technical problems or maintenance needs.          |
+| **Frequent Asset Categories**            | Analyze which asset categories are used the most (e.g., laptops, monitors). Good for purchase planning.                              |
+| **Monthly Asset Purchase Volume**        | Track how many assets were bought in each month. Helps budget forecasting.                                                           |
+| **Asset Utilization Efficiency**         | Percentage of total assets that are currently allocated. Indicates whether assets are underutilized.                                 |
+| **Department-wise Allocation Breakdown** | If department data is added, you can break down assets assigned per department.                                                      |
+
+| **Upcoming Warranty Expirations**        | Timeline or list of assets whose warranty is about to expire. Useful for proactive action.                                           |
+
+Dynamic filtering in reports (date range, department, asset type)
+
+Auto-generated insights (e.g., “This month saw a 15% drop in available assets”)
+
+Predictive flags (e.g., “3 assets likely to go out of warranty next month” using date-based logic)
+
+Interactive dashboards (filter by status/designation and watch charts update)
+
+}
