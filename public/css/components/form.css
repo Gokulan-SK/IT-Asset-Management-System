@@ -1,0 +1,135 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+label {
+    font-size: 14px;
+    color: #344054;
+    font-weight: 500;
+}
+
+.label-input {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+textarea,
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #D0D5DD;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: #FFFFFF;
+    box-sizing: border-box;
+}
+
+input[type="date"],
+select {
+    cursor: pointer;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+input[type="date"]:focus,
+select:focus {
+    border-color: #0F2BB3;
+    outline: none;
+}
+
+input[type="file"] {
+    color: #344054;
+    background-color: #FFFFFF;
+    cursor: pointer;
+}
+
+input[type="file"]::file-selector-button {
+    padding: 10px;
+    background-color: #FFFFFF;
+    color: #344054;
+    border: 1px solid #344054;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+input[type="file"]::file-selector-button:hover,
+input[type="file"]::file-selector-button:focus {
+    background-color: #344054;
+    color: #FFFFFF;
+    outline: none;
+}
+
+.field-error {
+    border-color: #E11D48 !important;
+    background-color: #FFF1F2;
+}
+
+.name {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.first-name,
+.last-name {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.submit-reset {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: flex-end;
+}
+
+button[type="submit"] {
+    background-color: #FFFFFF;
+    color: #0F2BB3;
+    border: 1px solid #0F2BB3;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button[type="submit"]:hover {
+    background-color: #0F2BB3;
+    color: #FFFFFF;
+}
+
+button[type="reset"] {
+    background-color: #FFFFFF;
+    color: #E11D48;
+    border: 1px solid #E11D48;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button[type="reset"]:hover {
+    background-color: #E11D48;
+    color: #FFFFFF;
+}

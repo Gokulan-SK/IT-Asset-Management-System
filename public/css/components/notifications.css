@@ -1,0 +1,15 @@
+.success-text,
+.error-text {
+    font-size: 16px;
+    font-weight: 600;
+    padding: 0;
+    margin-bottom: 10px;
+}
+
+.success-text {
+    color: #166534 !important;
+}
+
+.error-text {
+    color: #B91C1C !important;
+}
