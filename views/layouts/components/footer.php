@@ -2,7 +2,8 @@
 <?php
 if (isset($pageScripts)) {
     foreach ($pageScripts as $script) {
-        echo "<link rel='stylesheet' href='$script' />\n";
+        echo "<script src='" . BASE_URL . $script . "'></script>\n";
+        echo "console.log(" . BASE_URL . $script . ");\n";
     }
 }
 ?>

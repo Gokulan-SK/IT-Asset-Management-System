@@ -72,11 +72,11 @@ class EmployeeValidator
             $errors['usernameError'] = "Username already exists.";
         }
 
-        if (empty($data['first-name']) || !Helpers::isValidName($data['first-name'])) {
+        if (empty($data['first-name']) || !Helpers::isAlphabeticString($data['first-name'])) {
             $errors['firstNameError'] = "First name is required and can only contain letters.";
         }
 
-        if (empty($data['last-name']) || !Helpers::isValidName($data['last-name'])) {
+        if (empty($data['last-name']) || !Helpers::isAlphabeticString($data['last-name'])) {
             $errors['lastNameError'] = "Last name is required and can only contain letters.";
         }
 
@@ -126,11 +126,11 @@ class EmployeeValidator
             $errors['usernameError'] = "Invalid or duplicate username.";
         }
 
-        if (!empty($data['first-name']) && !Helpers::isValidName($data['first-name'])) {
+        if (!empty($data['first-name']) && !Helpers::isAlphabeticString($data['first-name'])) {
             $errors['firstNameError'] = "First name can only contain letters.";
         }
 
-        if (!empty($data['last-name']) && !Helpers::isValidName($data['last-name'])) {
+        if (!empty($data['last-name']) && !Helpers::isAlphabeticString($data['last-name'])) {
             $errors['lastNameError'] = "Last name can only contain letters.";
         }
 

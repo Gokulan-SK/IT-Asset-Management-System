@@ -1,0 +1,41 @@
+{
+    "hardware": {
+      "label": "Hardware",
+      "subcategories": [
+        "Laptop",
+        "Desktop",
+        "Server",
+        "Mobile Device",
+        "Networking Equipment",
+        "Storage Device",
+        "Accessories"
+      ]
+    },
+    "software": {
+      "label": "Software",
+      "subcategories": [
+        "Operating System",
+        "Productivity Tool",
+        "Development Tool",
+        "Security Software",
+        "Enterprise Software",
+        "Cloud Subscription"
+      ]
+    },
+    "office_equipment": {
+      "label": "Office Equipment",
+      "subcategories": [
+        "Printer",
+        "Scanner",
+        "Projector",
+        "Audio Visual Equipment",
+        "Video Conferencing Equipment",
+        "Telphones",
+        "Fax Machines"
+      ]
+    },
+    "other" : {
+        "label": "Other"
+    }
+  }
+  

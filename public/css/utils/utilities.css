@@ -9,3 +9,8 @@
     width: 100%;
     overflow: hidden;
 }
+
+.required::after {
+    content: "*";
+    color: red;
+}

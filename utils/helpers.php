@@ -7,9 +7,9 @@ class Helpers
         return preg_match('/^[a-zA-Z0-9_]+$/', $username);
     }
 
-    public static function isValidName(string $name): bool
+    public static function isAlphabeticString(string $name): bool
     {
-        return preg_match('/^[a-zA-Z ]+$/', $name);
+        return (bool) preg_match('/^[a-zA-Z ]+$/', $name);
     }
 
     public static function isValidEmail(string $email): bool
