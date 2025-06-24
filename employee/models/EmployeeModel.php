@@ -114,13 +114,16 @@ class EmployeeModel
             $stmt->bind_param("ssssssssi", $data["username"], $data["firstName"], $data["lastName"], $data["email"], $data["phone"], $data["dob"], $data["designation"], $data["is_admin"], $id);
             $stmt->execute();
             $result = $stmt->affected_rows;
+            if ($stmt->error) {
+                error_log("EmployeeModel::updateEmployee Error:" . $stmt->error);
+                return false;
+            }
             $stmt->close();
-            return $result > 0;
+            return true;
         } catch (Exception $e) {
             error_log("EmployeeModel::updateEmployee Error:" . $e->getMessage());
             return false;
         }
-
     }
     public static function deleteEmployee(mysqli $conn, int $id)
     {

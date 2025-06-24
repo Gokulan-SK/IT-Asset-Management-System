@@ -39,3 +39,15 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+const closebtn = document.getElementsByClassName("closebtn");
+//alert close button functionality
+for (let i = 0; i < closebtn.length; i++) {
+  closebtn[i].addEventListener("click", function (e) {
+    const div = e.target.parentNode; // Get the parent element of the close button
+    div.style.opacity = 0;
+    setTimeout(function () {
+      div.style.display = "none";
+    }, 600); // Wait for the fade-out transition to complete
+  });
+}

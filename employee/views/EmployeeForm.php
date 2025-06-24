@@ -6,19 +6,22 @@
   <div>
     <?php
     $errors = $errors ?? [];
-    $success = $success ?? '';
-    $errorMessage = $errorMessage ?? '';
     $formData = $formData ?? [];
     $action = $action ?? 'employee/add';
     $isUpdate = $action == 'employee/update' ? true : false;
     ?>
 
-    <?php if (!empty($success)): ?>
-      <p class="success-text"><?php echo htmlspecialchars($success); ?></p>
+    <?php if (isset($successMessage)): ?>
+      <div class="alert success">
+        <span class="closebtn">&times;</span>
+        <p><?= htmlspecialchars($successMessage); ?></p>
+      </div>
     <?php endif; ?>
-
-    <?php if (!empty($errorMessage)): ?>
-      <p class="error-text"><?php echo htmlspecialchars($errorMessage); ?></p>
+    <?php if (isset($errorMessage)): ?>
+      <div class="alert error">
+        <span class="closebtn">&times;</span>
+        <p><?= htmlspecialchars($errorMessage); ?></p>
+      </div>
     <?php endif; ?>
 
     <form action="<?= BASE_URL . $action ?>" method="POST" class="form">

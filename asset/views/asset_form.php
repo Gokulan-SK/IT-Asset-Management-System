@@ -3,8 +3,16 @@
 <div class="content-frame">
   <h3>Add Asset</h3>
   <div>
+    <?php
+    $errors = $errors ?? [];
+    $success = $success ?? '';
+    $action = $action ?? 'asset/add';
+    $errorMessage = $errorMessage ?? '';
+    $formData = $formData ?? [];
 
-    <form action="#" class="form">
+    ?>
+
+    <form action="<?= BASE_URL . $action ?>" method="POST" class="form" enctype="multipart/form-data">
       <div class="label-input">
         <label for="name" class=" required">Name</label>
         <input type="text" name="name" id="name" placeholder="Asset Name" value="" autocomplete="" required />
@@ -33,16 +41,16 @@
       </div>
       <div class="label-input hardware">
         <label for="serial-number" class=" required">Serial Number</label>
-        <input type="text" name="serial-number" id="serial-number" placeholder="Serial Number" value="" autocomplete=""
-          required />
+        <input type="text" name="serial-number" id="serial-number" placeholder="Serial Number" value=""
+          autocomplete="" />
       </div>
       <div class="label-input">
-        <label for="date-of-purchase">Date of Purchase</label>
-        <input type="date" name="date-of-purchase" id="date-of-purchase" />
+        <label for="purchase-date">Purchase Date</label>
+        <input type="date" name="purchase-date" id="purchase-date" />
       </div>
       <div class="label-input">
-        <label for="note">Note</label>
-        <textarea name="note" id="note" placeholder="Additional Notes"></textarea>
+        <label for="notes">Note</label>
+        <textarea name="notes" id="notes" placeholder="Additional Notes"></textarea>
       </div>
       <div class="label-input hardware">
         <label for="warranty-period">Warranty Period in Months</label>
@@ -51,7 +59,7 @@
       </div>
       <div class="label-input hardware">
         <label for="condition">Asset Condition</label>
-        <select name="condition" id="condition" required>
+        <select name="condition" id="condition">
           <option value="new" default>New</option>
           <option value="good">Good</option>
           <option value="needs-repair">needs-repair</option>
@@ -60,18 +68,16 @@
       </div>
       <div class="label-input software">
         <label for="license-key" class=" required">License Key</label>
-        <input type="text" name="license-key" id="license-key" placeholder="License Key" value="" autocomplete=""
-          required />
+        <input type="text" name="license-key" id="license-key" placeholder="License Key" value="" autocomplete="" />
       </div>
       <div class="label-input software">
         <label for="license-expiry">License Expiry Date</label>
         <input type="date" name="license-expiry" id="license-expiry" placeholder="License Expiry Date" value=""
-          autocomplete="" required />
+          autocomplete="" />
       </div>
       <div class="label-input">
         <label for="status">Asset Status</label>
-        <select name="status" id="status" required value="">
-          <option value="" disabled selected>select a status</option>
+        <select name="status" id="status" value="">
         </select>
       </div>
       <div class="label-input">
@@ -79,8 +85,8 @@
         <input type="number" name="unit-price" id="unit-price" placeholder="Unit Price" value="" autocomplete="" />
       </div>
       <div class="label-input">
-        <label for="image">Image</label>
-        <input type="file" name="image" id="image" accept="image/*" placeholder="Upload Image" />
+        <label for="asset-image">Image</label>
+        <input type="file" name="asset-image" id="asset-image" accept="image/*" placeholder="Upload Image" />
       </div>
       <div class="submit-reset">
         <button type="reset">Clear</button>

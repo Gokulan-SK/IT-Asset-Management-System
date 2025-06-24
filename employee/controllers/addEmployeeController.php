@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!empty($errors)) {
         require BASE_PATH . "views/layouts/layout.php";
-        exit;
+        exit(0);
     }
 
     $data = [
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result) {
         $_SESSION['success'] = "Employee added successfully.";
         $formData = null;
-        header("Location: " . BASE_URL . "employee/add");
+        header("Location: " . BASE_URL . "employee/view");
         exit;
     } else {
         $errorMessage = "Error adding employee.";
@@ -44,8 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $success = $_SESSION['success'] ?? '';
-    unset($_SESSION['success']);
     require BASE_PATH . "views/layouts/layout.php";
-    exit;
+    exit(0);
 }

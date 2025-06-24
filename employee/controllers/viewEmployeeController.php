@@ -10,19 +10,19 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
     $employees = [];
     $totalRecordsCount = 0;
     $totalPages = 1;
-    $employeeDeleteError = null;
-    $employeeDeleteSuccess = null;
+    $errorMessage = null;
+    $successMessage = null;
 
-    //check for delete success message
-    if (isset($_SESSION['employeeDeleteSuccess'])) {
-        $employeeDeleteSuccess = $_SESSION['employeeDeleteSuccess'];
-        unset($_SESSION['employeeDeleteSuccess']);
+    //check for success message
+    if (isset($_SESSION['success'])) {
+        $successMessage = $_SESSION['success'];
+        unset($_SESSION['success']);
     }
 
-    //check for delete error message
-    if (isset($_SESSION['employeeDeleteError'])) {
-        $employeeDeleteError = $_SESSION['employeeDeleteError'];
-        unset($_SESSION['employeeDeleteError']);
+    //check for error message
+    if (isset($_SESSION['error'])) {
+        $errorMessage = $_SESSION['error'];
+        unset($_SESSION['error']);
     }
 
     try {

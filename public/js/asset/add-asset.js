@@ -13,9 +13,9 @@ const statusOptions = {
     { value: "inactive", text: "Inactive" },
   ],
   hardware: [
-    { value: "assigned", text: "Assigned" },
-    { value: "available", text: "Available" },
-    { value: "under-maintenance", text: "Under Maintenance" },
+    { value: "in_storage", text: "In Storage" },
+    { value: "in_use", text: "In use" },
+    { value: "under-repair", text: "Under Repair" },
     { value: "retired", text: "Retired" },
     { value: "disposed", text: "Disposed" },
   ],

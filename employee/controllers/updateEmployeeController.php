@@ -78,7 +78,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($result) {
         $_SESSION['success'] = "Employee updated successfully.";
-        header("Location: " . BASE_URL . "employee/add");
+        header("Location: " . BASE_URL . "employee/view");
         exit;
     } else {
         $errorMessage = "Error updating employee.";

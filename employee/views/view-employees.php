@@ -31,17 +31,19 @@ $paginationError = $paginationError ?? null;
       </div>
     </div>
 
+    <?php if (isset($successMessage)): ?>
+      <div class="alert success">
+        <span class="closebtn">&times;</span>
+        <p><?= htmlspecialchars($successMessage); ?></p>
+      </div>
+    <?php endif; ?>
+    <?php if (isset($errorMessage)): ?>
+      <div class="alert error">
+        <span class="closebtn">&times;</span>
+        <p><?= htmlspecialchars($errorMessage); ?></p>
+      </div>
+    <?php endif; ?>
     <div class="table">
-      <?php if (isset($SuccessMessage)): ?>
-        <div class="success-text">
-          <p><?= htmlspecialchars($SuccessMessage); ?></p>
-        </div>
-      <?php endif; ?>
-      <?php if (isset($errorMessage)): ?>
-        <div class="error-text">
-          <p><?= htmlspecialchars($errorMessage); ?></p>
-        </div>
-      <?php endif; ?>
       <table>
         <thead>
           <tr>
