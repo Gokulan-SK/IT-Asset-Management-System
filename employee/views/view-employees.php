@@ -68,9 +68,8 @@ $paginationError = $paginationError ?? null;
                 <td>
                   <a href="<?= BASE_URL ?>employee/update?id=<?= $emp['emp_id']; ?>"><button
                       class="edit-button">Edit</button></a>
-                  <a href="<?= BASE_URL ?>employee/delete?id=<?= $emp['emp_id']; ?>"><button
-                      class="delete-button">Delete</button>
-                  </a>
+                  <button class="delete-button" data-id="<?= $emp['emp_id']; ?>">Delete</button>
+
                 </td>
               </tr>
             <?php endforeach; ?>
@@ -114,4 +113,18 @@ $paginationError = $paginationError ?? null;
       </div>
     </div>
   </div>
+</div>
+
+<!-- Delete confirmation popup -->
+<div class="modal" id="delete-modal">
+  <form id="delete-form" class="modal-content" method="POST" action="">
+    <input type="hidden" name="id" id="delete-item-id" />
+    <span class="modal-closebtn">&times;</span>
+    <h2>Delete Employee</h2>
+    <p>Are you sure you want to delete this employee?</p>
+    <div class="button-group">
+      <button type="button" class="cancel-button">Cancel</button>
+      <button type="submit" class="confirm-button">Confirm</button>
+    </div>
+  </form>
 </div>

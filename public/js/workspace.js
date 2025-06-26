@@ -5,8 +5,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const userInfo = document.getElementById("user-info");
   const dropdown = document.getElementById("user-dropdown");
 
-  console.log(sidebar, toggleButton, parentMenus, userInfo, dropdown);
-
   // Toggle menu visibility
   toggleButton.addEventListener("click", () => {
     sidebar.classList.toggle("collapsed");

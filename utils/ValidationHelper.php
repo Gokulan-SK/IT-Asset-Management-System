@@ -4,6 +4,18 @@ require_once BASE_PATH . 'asset/helpers/AssetHelper.php';
 
 class ValidationHelper
 {
+
+    public static function isAbsolutePath($path)
+    {
+        $pattern = "/^(?:[a-zA-Z]:\\\\|\/)[\w\s\-\.\/\\\\]+$/";
+        return preg_match($pattern, $path);
+    }
+
+    public static function isPositiveInteger($value)
+    {
+        return $value >= 0 ? true : false;
+    }
+
     public static function isAlphabeticString(string $name): bool
     {
         return (bool) preg_match('/^[a-zA-Z ]+$/', $name);

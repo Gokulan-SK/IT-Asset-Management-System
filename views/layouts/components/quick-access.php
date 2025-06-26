@@ -7,8 +7,9 @@
 
     <a href="<?= BASE_URL ?>asset/add">Add Asset</a>
 
+    <a href="<?= BASE_URL ?>asset/view">View Assets</a>
+
     <a href="<?= BASE_URL ?>asset/allocate">Allocate Asset</a>
 
-    <a href="<?= BASE_URL ?>asset/view">View Assets</a>
     <!-- <a href="<?= BASE_URL ?>asset/history">Asset History</a> -->
 </div>

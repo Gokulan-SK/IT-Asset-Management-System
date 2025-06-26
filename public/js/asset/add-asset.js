@@ -14,8 +14,8 @@ const statusOptions = {
   ],
   hardware: [
     { value: "in_storage", text: "In Storage" },
-    { value: "in_use", text: "In use" },
-    { value: "under-repair", text: "Under Repair" },
+    { value: "in_use", text: "In Use" },
+    { value: "under_repair", text: "Under Repair" },
     { value: "retired", text: "Retired" },
     { value: "disposed", text: "Disposed" },
   ],
@@ -26,96 +26,98 @@ const subcategory = {
     { value: "laptop", text: "Laptop" },
     { value: "desktop", text: "Desktop" },
     { value: "server", text: "Server" },
-    { value: "mobile-device", text: "Mobile Device" },
-    { value: "networking-equipment", text: "Networking Equipment" },
-    { value: "storage-device", text: "Storage Device" },
+    { value: "mobile_device", text: "Mobile Device" },
+    { value: "networking_equipment", text: "Networking Equipment" },
+    { value: "storage_device", text: "Storage Device" },
     { value: "accessories", text: "Accessories" },
   ],
   software: [
-    { value: "operating-system", text: "Operating System" },
-    { value: "productivity-tool", text: "Productivity Tool" },
-    { value: "development-tool", text: "Development Tool" },
-    { value: "security-software", text: "Security Software" },
-    { value: "enterprise-software", text: "Enterprise Software" },
-    { value: "cloud-subscription", text: "Cloud Subscription" },
+    { value: "operating_system", text: "Operating System" },
+    { value: "productivity_tool", text: "Productivity Tool" },
+    { value: "development_tool", text: "Development Tool" },
+    { value: "security_software", text: "Security Software" },
+    { value: "enterprise_software", text: "Enterprise Software" },
+    { value: "cloud_subscription", text: "Cloud Subscription" },
   ],
-
-  office_equipments: [
+  office_equipment: [
     { value: "printer", text: "Printer" },
     { value: "scanner", text: "Scanner" },
     { value: "projector", text: "Projector" },
-    { value: "audio-visual-equipment", text: "Audio Visual Equipment" },
+    { value: "audio_visual-equipment", text: "Audio Visual Equipment" },
     {
-      value: "video-conferencing-equipment",
+      value: "video_conferencing-equipment",
       text: "Video Conferencing Equipment",
     },
     { value: "telephone", text: "Telephone" },
-    { value: "fax-machine", text: "Fax Machine" },
+    { value: "fax_machine", text: "Fax Machine" },
   ],
-
-  other: [],
+  other: [], // no subcategories for "other"
 };
 
-function updateStatusDropdown(category) {
+function updateStatusDropdown(categoryKey) {
   statusDropdown.innerHTML =
-    '<option value="" disabled selected>select a status</option>';
-  const options = statusOptions[category];
-  options.forEach((option) => {
+    '<option value="" disabled selected>Select a status</option>';
+  const options =
+    statusOptions[categoryKey === "software" ? "software" : "hardware"] || [];
+
+  options.forEach((option, index) => {
     const opt = document.createElement("option");
     opt.value = option.value;
     opt.textContent = option.text;
-    if (
-      (category === "office-equipments" ||
-        category === "hardware" ||
-        category === "other") &&
-      opt.value === "available"
-    ) {
-      opt.setAttribute("selected", "selected");
-    } else if (category === "software" && opt.value === "inactive") {
-      opt.setAttribute("selected", "selected");
-    }
+    if (index === 0) opt.setAttribute("selected", "selected");
     statusDropdown.appendChild(opt);
   });
 }
 
-function updateSubcategoryDropdown(category) {
+function updateSubcategoryDropdown(categoryKey) {
+  const options = subcategory[categoryKey] || [];
+
+  if (options.length === 0) {
+    subcategoryContainer.classList.add("hidden");
+    subcategorySelect.classList.add("hidden");
+    subcategorySelect.innerHTML = "";
+    return;
+  }
+
   subcategorySelect.innerHTML =
     '<option value="" disabled selected>Select a subcategory</option>';
-  const options = subcategory[category];
   options.forEach((option) => {
     const opt = document.createElement("option");
     opt.value = option.value;
     opt.textContent = option.text;
     subcategorySelect.appendChild(opt);
   });
+
+  subcategoryContainer.classList.remove("hidden");
+  subcategorySelect.classList.remove("hidden");
 }
 
 category.addEventListener("change", function () {
   const selectedCategory = category.value;
 
+  // Reset visibility
+  softwareGroup.forEach((group) => group.classList.add("hidden"));
+  hardwareGroup.forEach((group) => group.classList.add("hidden"));
+
   if (selectedCategory === "software") {
-    subcategoryContainer.classList.remove("hidden");
     softwareGroup.forEach((group) => group.classList.remove("hidden"));
-    hardwareGroup.forEach((group) => group.classList.add("hidden"));
     updateStatusDropdown("software");
     updateSubcategoryDropdown("software");
   } else if (selectedCategory === "hardware") {
-    subcategoryContainer.classList.remove("hidden");
-    softwareGroup.forEach((group) => group.classList.add("hidden"));
     hardwareGroup.forEach((group) => group.classList.remove("hidden"));
     updateStatusDropdown("hardware");
     updateSubcategoryDropdown("hardware");
-  } else if (selectedCategory === "office-equipment") {
-    subcategoryContainer.classList.remove("hidden");
-    softwareGroup.forEach((group) => group.classList.add("hidden"));
+  } else if (selectedCategory === "office_equipment") {
     hardwareGroup.forEach((group) => group.classList.remove("hidden"));
     updateStatusDropdown("hardware");
-    updateSubcategoryDropdown("office_equipments");
+    updateSubcategoryDropdown("office_equipment");
   } else if (selectedCategory === "other") {
-    softwareGroup.forEach((group) => group.classList.add("hidden"));
-    hardwareGroup.forEach((group) => group.classList.add("hidden"));
+    hardwareGroup.forEach((group) => group.classList.remove("hidden"));
     updateStatusDropdown("hardware");
-    subcategorySelect.classList.add("hidden");
+    updateSubcategoryDropdown("other"); // will auto-hide dropdown
+  } else {
+    updateStatusDropdown("hardware");
+    updateSubcategoryDropdown("other");
   }
 });
 

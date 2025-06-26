@@ -56,6 +56,9 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
 
     $pageTitle = "View Employees";
     $viewToInclude = BASE_PATH . "employee/views/view-employees.php";
+    $pageScripts = [
+        "public/js/components/modal.js",
+    ];
     require BASE_PATH . "views/layouts/layout.php";
     exit;
 }

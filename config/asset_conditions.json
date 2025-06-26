@@ -1,0 +1,8 @@
+{
+    "condition":[
+        "new",
+        "good",
+        "needs_repair",
+        "damaged"
+    ]
+}

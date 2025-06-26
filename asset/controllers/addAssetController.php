@@ -1,7 +1,8 @@
 <?php
-
+// asset/controllers/addAssetController.php
 require_once BASE_PATH . "asset/helpers/AssetHelper.php";
 require_once BASE_PATH . "asset/models/AssetModel.php";
+require_once BASE_PATH . "utils/validators/AssetValidator.php";
 
 $viewToInclude = BASE_PATH . "asset/views/asset_form.php";
 $pageTitle = "Add Asset";
@@ -31,7 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $imageFile = $_FILES['asset-image'] ?? '';
     $imagePath = AssetHelper::handleImageUpload($imageFile, BASE_PATH . "public/uploads/asset/asset-images/");
 
-
     $data = [
         "name" => trim($formData['name'] ?? null),
         "category" => trim($formData['category'] ?? null),
@@ -41,19 +41,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         "license-key" => trim($formData['license-key'] ?? null) ?: null,
         "license-expiry" => $formData['license-expiry'] ?? null,
         "warranty-period" => is_numeric($formData['warranty-period']) ? (int) $formData['warranty-period'] : null,
-        "unit-price" => is_numeric($formData['unit-price']) ? (float) $formData['unit-price'] : null,
+        "unit-price" => is_numeric($formData['unit-price']) ? (int) $formData['unit-price'] : null,
         "status" => trim($formData['status'] ?? null),
         "condition" => trim($formData['condition'] ?? null),
         "notes" => trim($formData['notes'] ?? null),
-        "image" => $imagePath,
+        "image" => $imagePath["path"] ?? null
     ];
 
     //validate data
-    // $errors = AssetValidator::validateForCreate($conn, $data);
+    $errors = AssetValidator::validateForCreate($data);
 
-    if ($errors !== null) {
+    if (isset($imagePath["imageError"])) {
+        $errors['imageError'] = $imagePath["imageError"];
+    }
+
+    if (!empty($errors)) {
         $errorMessage = "Errors found in the form data!";
-        header("Location: " . BASE_URL . "asset/add");
+        require_once BASE_PATH . "views/layouts/layout.php";
         exit;
     }
 

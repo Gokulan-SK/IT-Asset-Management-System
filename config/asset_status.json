@@ -1,0 +1,15 @@
+{
+    "software": [
+        "active",
+        "expired",
+        "revoked",
+        "inactive"
+    ],
+      "hardware": [
+        "in_storage",
+        "in_use",
+        "under_repair",
+        "retired",
+        "disposed"
+    ]
+}

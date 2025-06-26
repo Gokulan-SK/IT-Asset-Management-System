@@ -3,19 +3,17 @@
 require_once BASE_PATH . "utils/ValidationHelper.php";
 require_once BASE_PATH . 'employee/models/EmployeeModel.php';
 //retrieve employee ID from query
-$url = $_SERVER['REQUEST_URI'];
-$urlComponents = parse_url($url);
-parse_str($urlComponents['query'], $params);
+
 
 //validate employee ID
-$result = ValidationHelper::isNumeric($params['id'] ?? null);
+$result = ValidationHelper::isNumeric($_POST['id'] ?? null);
 
 if (!$result) {
-    $_SESSION['employeeDeleteError'] = "Invalid employee ID.";
+    $_SESSION['error'] = "Invalid employee ID.";
     header("location: " . BASE_URL . "employee/view");
     exit;
 }
-$emp_id = (int) $params['id'];
+$emp_id = (int) $_POST['id'];
 
 try {
     $result = EmployeeModel::deleteEmployee($conn, $emp_id);

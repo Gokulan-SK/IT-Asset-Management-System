@@ -1,20 +1,24 @@
 <?php
-//asset/helpers/get_categories.php
+//asset/helpers/AssetHelper.php
 
 class AssetHelper
 {
-    public static function handleImageUpload(array $file, string $uploadDir = BASE_URL . 'public/uploads'): ?string
+    public static function handleImageUpload(array $file, string $uploadDir = BASE_URL . 'public/uploads')
     {
 
         //check for empty file or upload error
-        if (empty($file['tmp_name']) || $file['error'] !== UPLOAD_ERR_OK) {
+        if (empty($file['tmp_name'])) {
             return null;
+        }
+
+        if (!empty($file['tmp_name']) && $file['error'] !== UPLOAD_ERR_OK) {
+            return ["imageError" => "File upload error: " . $file['error']];
         }
 
         //validate file type
         $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
         if (!in_array($file['type'], $allowedTypes)) {
-            return null;
+            return ["imageError" => "Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed."];
         }
 
         //Generate unique file name
@@ -30,9 +34,9 @@ class AssetHelper
         //move uploaded file
         $destination = $targetPath . $newFIleName;
         if (move_uploaded_file($file['tmp_name'], $destination)) {
-            return $destination;
+            return ["path" => $destination];
         }
-        return null;
+        return ["imageError" => "Failed to move uploaded file to destination."];
     }
     public static function getCategories()
     {
