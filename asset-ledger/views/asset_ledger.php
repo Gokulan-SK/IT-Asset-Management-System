@@ -1,9 +1,12 @@
-<?php include BASE_PATH . "views/layouts/components/head.php"; ?>
+<?php
+include BASE_PATH . "views/layouts/components/quick-access.php";
+?>
+
 <div class="content-frame">
   <div class="table-container">
     <div class="table-header">
       <div class="table-heading">
-        <h3>Asset Allocation History</h3>
+        <h3><?= $pageTitle ?? "Asset Management System" ?></h3>
       </div>
       <div class="table-actions">
         <div class="search-bar">
@@ -19,6 +22,26 @@
         </div>
       </div>
     </div>
+
+    <?php
+    $errors = $errors ?? null;
+    $successMessage = $successMessage ?? null;
+    $errorMessage = $errorMessage ?? null;
+
+    ?>
+
+    <?php if (isset($successMessage)): ?>
+      <div class="alert success">
+        <span class="closebtn">&times;</span>
+        <p><?= htmlspecialchars($successMessage); ?></p>
+      </div>
+    <?php endif; ?>
+    <?php if (isset($errorMessage)): ?>
+      <div class="alert error">
+        <span class="closebtn">&times;</span>
+        <p><?= htmlspecialchars($errorMessage); ?></p>
+      </div>
+    <?php endif; ?>
 
     <div class="table">
       <table>

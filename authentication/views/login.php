@@ -5,8 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login</title>
-  <link rel="stylesheet" href="../../public/css/pages/login.css" />
-  <link rel="stylesheet" href="../../public/css/style.css" />
+  <link rel="stylesheet" href="<?= BASE_URL ?>public/css/pages/login.css" />
+  <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css" />
 </head>
 
 <body>
@@ -27,25 +27,38 @@
       <br />
       <h3>Login to start your session</h3>
       <br />
+      <?php
+
+      $errors = $errors ?? [];
+
+      ?>
+
+
       <div class="form">
         <form action="" method="post">
           <div class="input-field">
             <div class="input-group">
               <input type="text" name="username" id="username" placeholder="" required autocomplete="" value="" />
               <label for="username">Email</label>
+              <?php if (!empty($errors['usernameError'])): ?>
+                <p class="error-text"><?php echo htmlspecialchars($errors['usernameError']); ?></p>
+              <?php endif; ?>
             </div>
             <br />
             <div class="input-group">
               <input type="password" name="password" id="password" placeholder="" required autocomplete="new-password"
                 value="" />
               <label for="password">Password</label>
+              <?php if (!empty($errors['passwordError'])): ?>
+                <p class="error-text"><?php echo htmlspecialchars($errors['passwordError']); ?></p>
+              <?php endif; ?>
             </div>
           </div>
           <br />
           <div class="form-footer">
-            <label for="remember-me"><input type="checkbox" name="remember-me" id="remember-me" value="true" />Remember
+            <label for="remember-me"><input type="checkbox" name="remember-me" id="remember-me" value="1" />Remember
               me</label>
-            <a href="#" id="forgot-pwd">Forgot password?</a>
+            <a href="<?= BASE_URL ?>forgot-password" id="forgot-pwd">Forgot password?</a>
           </div>
           <br /><br />
           <div class="submit-button">

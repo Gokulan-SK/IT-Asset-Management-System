@@ -18,12 +18,13 @@
         <div class="user-info" id="user-info">
             <a href="#">
                 <img src="<?= BASE_URL ?>public/img/user-icon.png" alt="User Icon" class="user-icon" />
-                <span class="user-name">John Doe</span>
+                <span
+                    class="user-name"><?= isset($_SESSION["user"]["firstName"]) ? $_SESSION["user"]["firstName"] : "User"; ?></span>
                 <img src="<?= BASE_URL ?>public/img/down-arrow.png" alt="" id="down-arrow" />
             </a>
             <div class="user-dropdown hidden" id="user-dropdown">
                 <a href="#">View Profile</a>
-                <a href="#">Logout</a>
+                <a href="<?= BASE_URL ?>logout">Logout</a>
             </div>
         </div>
     </div>

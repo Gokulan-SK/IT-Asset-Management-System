@@ -4,7 +4,12 @@ require_once BASE_PATH . "asset/models/AssetModel.php";
 require_once BASE_PATH . "utils/validators/AssetValidator.php";
 $pageTitle = "Update Asset";
 $viewToInclude = BASE_PATH . "asset/views/asset_form.php";
+$pageScripts = [
+    BASE_URL . "public/js/asset/add-asset.js",
+];
 $action = "asset/update";
+$errorMessage = null;
+$successMessage = null;
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
@@ -34,6 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     }
 
     $formData = [
+        "asset_id" => $id,
         "name" => $assetData["name"],
         "category" => $assetData["category"],
         "subcategory" => $assetData["subcategory"],
@@ -43,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         "licenseExpiry" => $assetData["license_expiry"],
         "warrantyPeriod" => $assetData["warranty_period"],
         "unitPrice" => $assetData["unit_price"],
-        "assetStatus" => $assetData["asset_status"],
+        "status" => $assetData["asset_status"],
         "assetCondition" => $assetData["asset_condition"],
         "notes" => $assetData["notes"],
         "image" => $image,
@@ -51,7 +57,51 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
     require_once BASE_PATH . "views/layouts/layout.php";
     exit;
-}
+} else if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $id = (int) $_POST["id"];
+    $imageFile = $_FILES['asset-image'] ?? '';
+    $imagePath = AssetHelper::handleImageUpload($imageFile, BASE_PATH . "public/uploads/asset/asset-images/");
 
+    $formData = [
+        "name" => trim(string: $_POST['name'] ?? null),
+        "category" => trim($_POST['category'] ?? null),
+        "subcategory" => trim($_POST['subcategory'] ?? null),
+        "purchase-date" => $_POST['purchase-date'] ?? null,
+        "serial-number" => trim($_POST['serial-number'] ?? null) ?: null,
+        "license-key" => trim($_POST['license-key'] ?? null),
+        "license-expiry" => $_POST['license-expiry'] ?? null,
+        "warranty-period" => is_numeric($_POST['warranty-period']) ? (int) $_POST['warranty-period'] : null,
+        "unit-price" => is_numeric($_POST['unit-price']) ? (int) $_POST['unit-price'] : null,
+        "status" => trim($_POST['status'] ?? null),
+        "condition" => trim($_POST['condition'] ?? null),
+        "notes" => trim($_POST['notes'] ?? null),
+        "image" => $imagePath["path"] ?? null
+    ];
+    if (isset($imagePath["imageError"])) {
+        $errors['imageError'] = $imagePath["imageError"];
+    }
+
+    // $errors = AssetValidator::validateForUpdate($formData);
+
+    if (!empty($errors)) {
+        $errorMessage = "Errors found in the form data!";
+        require_once BASE_PATH . "views/layouts/layout.php";
+        exit;
+    }
+
+    $updated = AssetModel::update($conn, $formData, $id);
+
+    if ($updated) {
+        $_SESSION['success'] = "Asset updated successfully.";
+        header("Location: " . BASE_URL . "asset/view");
+        exit;
+    } else {
+        $_SESSION['error'] = "Error updating asset. Please try again.";
+        header("Location: " . BASE_URL . "asset/add");
+        exit;
+    }
+
+
+}
 
 ?>

@@ -48,7 +48,8 @@ $paginationError = $paginationError ?? null;
         <thead>
           <tr>
             <th id="table-primary-id">EMPLOYEE ID</th>
-            <th>NAME</th>
+            <th>FIRST NAME</th>
+            <th>LAST NAME</th>
             <th>DESIGNATION</th>
             <th>MOBILE NO</th>
             <th>EMAIL ID</th>
@@ -61,7 +62,8 @@ $paginationError = $paginationError ?? null;
             <?php foreach ($employees as $emp): ?>
               <tr>
                 <td><?= htmlspecialchars($emp["emp_id"]); ?></td>
-                <td><?= htmlspecialchars($emp["name"]); ?></td>
+                <td><?= htmlspecialchars($emp["first_name"]); ?></td>
+                <td><?= htmlspecialchars($emp["last_name"]); ?></td>
                 <td><?= htmlspecialchars($emp["designation"]); ?></td>
                 <td><?= htmlspecialchars($emp["phone"]); ?></td>
                 <td><?= htmlspecialchars($emp["email"]); ?></td>

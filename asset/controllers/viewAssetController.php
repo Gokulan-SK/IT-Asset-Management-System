@@ -1,4 +1,6 @@
 <?php
+// asset/controllers/viewAssetController.php
+
 require_once BASE_PATH . "asset/models/AssetModel.php";
 require_once BASE_PATH . "employee/models/EmployeeModel.php"; // For future "assigned to" lookup, if needed
 
@@ -57,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
     $pageTitle = "View Assets";
     $viewToInclude = BASE_PATH . "asset/views/asset_list.php";
     $pageScripts = [
-        "public/js/components/modal.js"
+        BASE_URL . "public/js/components/modal.js"
     ];
     require BASE_PATH . "views/layouts/layout.php";
     exit;

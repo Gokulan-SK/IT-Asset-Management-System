@@ -1,5 +1,6 @@
 <?php
 // utils/validators/AssetValidator.php
+require_once BASE_PATH . "config/database.php";
 require_once BASE_PATH . "asset/helpers/AssetHelper.php";
 require_once BASE_PATH . "utils/ValidationHelper.php";
 
@@ -11,9 +12,9 @@ class AssetValidator
         return $options;
     }
 
-    public static function validateStatus(string $status, $category)
+    public static function validateStatus(string $status, string $category)
     {
-        if (!isset($status))
+        if (empty($status))
             return;
 
         $status = strtolower($status); // Normalize input
@@ -52,7 +53,7 @@ class AssetValidator
 
     public static function validateCondition(string $condition)
     {
-        if (!isset($condition)) {
+        if (empty($condition)) {
             return;
         }
 
@@ -102,7 +103,6 @@ class AssetValidator
         }
     }
 
-    //this method checks if the given category and subcategory are valid and is present in the config/asset_categories.json file.
     public static function validateCategory(string $category, string $subcategory)
     {
         $category = strtolower($category);
@@ -110,7 +110,6 @@ class AssetValidator
 
         $categories = AssetHelper::getCategories();
 
-        // Normalize keys and subcategories
         $normalized = [];
         foreach ($categories as $key => $value) {
             $lowerKey = strtolower($key);
@@ -137,38 +136,41 @@ class AssetValidator
     }
 
 
-    public static function validateSerialNumber(string $serialNumber)
+    public static function validateSerialNumber(mysqli $conn, string $serialNumber, int $id = null)
     {
         if (empty($serialNumber)) {
             self::$errors["serialNumberError"] = "Serial Number is required.";
             return;
         }
-        $pattern = "/^[a-zA-Z0-9\-\/:\._\*\+]{6,50}$/";
+        $pattern = "/^[a-zA-Z0-9\-\/:\._\*\+ ]{6,50}$/";
         $result = preg_match($pattern, $serialNumber);
         if (!$result) {
             self::$errors["serialNumberError"] = "Please enter a valid serial number. It can only contain alphanumeric characters, hyphens, slashes, colons, dots, asterisks, and plus signs. It Number must be between 6 and 50 characters.";
             return;
+        } else if (!ValidationHelper::isUnique($conn, "asset", "serial_number", $serialNumber, "asset_id", $id)) {
+            self::$errors["serialNumberError"] = "Serial Number must be unique.";
         }
     }
 
-    public static function validateLicenseKey($licenseKey)
+    public static function validateLicenseKey(mysqli $conn, string $licenseKey, int $id = null)
     {
         if (empty($licenseKey)) {
             self::$errors["licenseKeyError"] = "License key is required.";
-            ;
             return;
         }
-        $pattern = "/^[A-Za-z0-9\_\.+=\[\]\{\}\(\):;,<>\?~\`!\@\#\$\%\^\&\*\|\-]{12,64}$/";
+        $pattern = "/[A-Za-z0-9\-_\.]{12,64}/";
         $result = preg_match($pattern, $licenseKey);
 
         if (!$result) {
             self::$errors["licenseKeyError"] = "License key can only contain alphanumeric characters, hyphens, slashes, colons, dots, asterisks, and plus signs. It must be between 12 and 64 characters long.";
             return;
+        } else if (!ValidationHelper::isUnique($conn, "asset", "license_key", $licenseKey, "asset_id", $id)) {
+            self::$errors["licenseKeyError"] = "License Key must be unique.";
         }
 
     }
 
-    public static function validateForCreate(array $data): array
+    public static function validateForCreate(mysqli $conn, array $data): array
     {
         self::$errors = []; // Reset errors for each validation call
 
@@ -193,20 +195,20 @@ class AssetValidator
         self::validateCategory($category, $subcategory);
 
         //validate purchase date
-        if (isset($purchaseDate) && !ValidationHelper::isValidDate($purchaseDate)) {
+        if (!empty($purchaseDate) && !ValidationHelper::isValidDate($purchaseDate)) {
             self::$errors['purchaseDateError'] = 'Purchase Date must be in YYYY-MM-DD format.';
         }
 
         //validate serial number
         if ($category !== "software") {
 
-            self::validateSerialNumber($serialNumber);
+            self::validateSerialNumber($conn, $serialNumber);
 
         }
         //validate license key and license expiry
-        if ($category == "software") {
-            self::validateLicenseKey($licenseKey);
-            if (!isset($licenseExpiry))
+        if ($category === "software") {
+            self::validateLicenseKey($conn, $licenseKey);
+            if (empty($licenseExpiry))
                 self::$errors["licenseExpiryError"] = "License expiry date is required for software assets.";
             else if (!ValidationHelper::isValidDate($licenseExpiry)) {
                 self::$errors["licenseExpiryError"] = "License expiry date must be in YYYY-MM-DD format.";
@@ -214,7 +216,7 @@ class AssetValidator
         }
 
         //validate warranty period
-        if ($category != "software") {
+        if ($category !== "software" && !empty($warrantyPeriod)) {
             self::validateWarranty($warrantyPeriod);
         }
 
@@ -227,20 +229,88 @@ class AssetValidator
         self::validateStatus($status, $category);
 
         //validate condition
-        if ($category != "software")
+        if ($category !== "software")
             self::validateCondition($condition);
 
         //validate notes
-        if (isset($notes)) {
+        if (!empty($notes)) {
             if (!ValidationHelper::isValidLength($notes, 0, 1000)) {
                 self::$errors["notesError"] = "Notes must be between 0 and 1000 characters.";
             }
         }
 
-        //validate image path
-        if (isset($imagePath)) {
+        return self::$errors;
+    }
+
+    public static function validateForUpdate(mysqli $conn, array $data): array
+    {
+        self::$errors = []; // Reset previous errors
+
+        $name = $data['name'] ?? null;
+        $category = $data['category'] ?? null;
+        $subcategory = $data['subcategory'] ?? null;
+        $purchaseDate = $data['purchase-date'] ?? null;
+        $serialNumber = $data['serial-number'] ?? null;
+        $licenseKey = $data['license-key'] ?? null;
+        $licenseExpiry = $data['license-expiry'] ?? null;
+        $warrantyPeriod = $data['warranty-period'] ?? null;
+        $unitPrice = $data['unit-price'] ?? null;
+        $status = $data['status'] ?? null;
+        $condition = $data['condition'] ?? null;
+        $notes = $data['notes'] ?? null;
+        $imagePath = $data['image'] ?? null;
+
+        if (!is_null($name)) {
+            self::validateName($name);
+        }
+
+        if (!is_null($category)) {
+            self::validateCategory($category, $subcategory ?? '');
+        }
+
+        if (!empty($purchaseDate) && !ValidationHelper::isValidDate($purchaseDate)) {
+            self::$errors['purchaseDateError'] = 'Purchase Date must be in YYYY-MM-DD format.';
+        }
+
+        if (!is_null($serialNumber) && $category !== 'software') {
+            self::validateSerialNumber($conn, $serialNumber);
+        }
+
+        if ($category === 'software') {
+            if (!is_null($licenseKey)) {
+                self::validateLicenseKey($conn, $licenseKey);
+            }
+
+            if (!is_null($licenseExpiry) && !ValidationHelper::isValidDate($licenseExpiry)) {
+                self::$errors["licenseExpiryError"] = "License expiry date must be in YYYY-MM-DD format.";
+            }
+        }
+
+        if (!is_null($warrantyPeriod) && $category !== 'software') {
+            self::validateWarranty($warrantyPeriod);
+        }
+
+        if (!is_null($unitPrice) && !ValidationHelper::isPositiveInteger($unitPrice)) {
+            self::$errors["unitPriceError"] = "Unit Price must be a positive integer.";
+        }
+
+        if (!is_null($status) && !is_null($category)) {
+            self::validateStatus($status, $category);
+        }
+
+        if (!is_null($condition) && $category !== 'software') {
+            self::validateCondition($condition);
+        }
+
+        if (!is_null($notes)) {
+            if (!ValidationHelper::isValidLength($notes, 0, 1000)) {
+                self::$errors["notesError"] = "Notes must be between 0 and 1000 characters.";
+            }
+        }
+
+        if (!is_null($imagePath)) {
             if (!ValidationHelper::isAbsolutePath($imagePath)) {
-                self::$errors["imageError"] = "Inavlid image path. Image path must be an absolute path.";
+                self::$errors["imageError"] = "Invalid image path. Must be an absolute path.";
             }
         }
 

@@ -80,7 +80,7 @@ class EmployeeModel
     public static function getPaginatedEmployeeList(mysqli $conn, int $limit, int $offset): array
     {
         try {
-            $query = " select emp_id, concat(first_name,' ',last_name) as name, designation, phone, email from employee order by emp_id limit ? offset ?";
+            $query = " select emp_id, first_name,last_name, designation, phone, email from employee order by emp_id limit ? offset ?";
             $stmt = $conn->prepare($query);
             $stmt->bind_param("ii", $limit, $offset);
             $stmt->execute();
@@ -113,7 +113,6 @@ class EmployeeModel
             }
             $stmt->bind_param("ssssssssi", $data["username"], $data["firstName"], $data["lastName"], $data["email"], $data["phone"], $data["dob"], $data["designation"], $data["is_admin"], $id);
             $stmt->execute();
-            $result = $stmt->affected_rows;
             if ($stmt->error) {
                 error_log("EmployeeModel::updateEmployee Error:" . $stmt->error);
                 return false;

@@ -18,7 +18,7 @@ class AssetModel
         }
 
         $stmt->bind_param(
-            "sssssssidssss",
+            "sssssssiissss",
             $data["name"],
             $data["category"],
             $data["subcategory"],
@@ -39,7 +39,7 @@ class AssetModel
         return $result;
     }
 
-    public static function getAssetById(mysqli $conn, $asset_id)
+    public static function getAssetById(mysqli $conn, $asset_id): array|bool
     {
         try {
 
@@ -57,11 +57,104 @@ class AssetModel
                 return $row;
             } else {
                 $stmt->close();
-                return null;
+                return false;
             }
         } catch (Exception $e) {
             error_log("AssetModel::getAssetById Error:" . $e->getMessage());
-            return null;
+            return false;
+        }
+    }
+
+    public static function getCategoryById(mysqli $conn, int $assetId): bool|string
+    {
+        try {
+            $query = "SELECT category FROM asset WHERE asset_id = ?";
+            $stmt = $conn->prepare($query);
+            if (!$stmt) {
+                error_log("AssetModel::getCategoryById - Error: " . mysqli_error($conn));
+                return false;
+            }
+            $stmt->bind_param("i", $assetId);
+            $stmt->execute();
+            if ($stmt->error) {
+                error_log("AssetModel::getCategoryById - Statement Error: " . $stmt->error);
+                $stmt->close();
+                return false;
+            }
+            $result = $stmt->get_result();
+            if ($result && $row = $result->fetch_assoc()) {
+                $stmt->close();
+                return $row["category"];
+            } else {
+                error_log("AssetModel::getCategoryById - No category found for asset ID: " . $assetId);
+                $stmt->close();
+                return false;
+            }
+        } catch (Exception $e) {
+            error_log("AssetModel::getCategoryById - Exception: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public static function update(mysqli $conn, array $data, int $id): bool
+    {
+        try {
+            $query = "update asset set name = ?, category = ?, subcategory = ?, purchase_date = ?, serial_number = ?, license_key = ?, license_expiry = ?, warranty_period = ?, unit_price = ?, asset_status = ?, asset_condition = ?, notes = ?, image_path = ? where asset_id = ?";
+            $stmt = $conn->prepare($query);
+            if (!$stmt) {
+                throw new Exception($conn->error);
+            }
+            $stmt->bind_param(
+                "sssssssiissssi",
+                $data["name"],
+                $data["category"],
+                $data["subcategory"],
+                $data["purchase-date"],
+                $data["serial-number"],
+                $data["license-key"],
+                $data["license-expiry"],
+                $data["warranty-period"],
+                $data["unit-price"],
+                $data["status"],
+                $data["condition"],
+                $data["notes"],
+                $data["image"],
+                $id
+            );
+            $stmt->execute();
+            if ($stmt->error) {
+                error_log("AssetModel::updateAsset Error:" . $stmt->error);
+                return false;
+            }
+            $stmt->close();
+            return true;
+        } catch (Exception $e) {
+            error_log("AssetModel::updateAsset Error:" . $e->getMessage());
+            return false;
+        }
+    }
+
+    public static function updateAssetStatus(mysqli $conn, int $assedId, string $status): bool
+    {
+        try {
+            $query = "UPDATE asset SET asset_status = ? WHERE asset_id = ?";
+
+            $stmt = $conn->prepare($query);
+            if (!$stmt) {
+                error_log("AssetModel::updateAssetStatus Error:" . mysqli_error($conn));
+                return false;
+            }
+            $stmt->bind_param("si", $status, $assedId);
+            $stmt->execute();
+            if ($stmt->error) {
+                error_log("AssetModel::updateAssetStatus Error:" . $stmt->error);
+                return false;
+            }
+            $stmt->close();
+            return true;
+        } catch (Exception $e) {
+            error_log("AssetModel::updateAssetStatus- Exception: " . $e->getMessage());
+            return false;
         }
     }
 

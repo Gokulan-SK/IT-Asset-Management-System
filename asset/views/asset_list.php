@@ -52,8 +52,9 @@ $paginationError = $paginationError ?? null;
         <thead>
           <tr>
             <th id="table-primary-id">Asset ID</th>
-            <th>Asset Name</th>
-            <th>Asset Category</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Subcategory</th>
             <th>Status</th>
             <th>Assigned To</th>
             <th>Actions</th>
@@ -66,6 +67,7 @@ $paginationError = $paginationError ?? null;
                 <td><?= htmlspecialchars($asset["asset_id"]); ?></td>
                 <td><?= htmlspecialchars($asset["name"]); ?></td>
                 <td><?= htmlspecialchars($asset["category"] ?? $asset["subcategory"]); ?></td>
+                <td><?= htmlspecialchars($asset["subcategory"] ?? "-"); ?></td>
                 <td><?= htmlspecialchars($asset["asset_status"] ?? "-"); ?></td>
                 <td>-</td>
                 <td>
@@ -105,13 +107,13 @@ $paginationError = $paginationError ?? null;
           }
           ?>
         </span>
+
         <div class="pagination-buttons">
-          <button class="<?= $currentPage <= 1 ? 'btn disabled' : 'btn-primary' ?>" <?= $currentPage <= 1 ? 'disabled' : '' ?>
-            onclick="window.location.href='<?= BASE_URL ?>asset/view?page=<?= $currentPage - 1 ?>'">
-            ← Previous
-          </button>
-          <button class="<?= $currentPage >= $totalPages ? 'btn disabled' : 'btn-primary' ?>" <?= ($currentPage >= $totalPages ? 'disabled' : '') ?>
-            onclick="window.location.href='<?= BASE_URL ?>asset/view?page=<?= $currentPage + 1 ?>'">Next →</button>
+          <button class="<?= $currentPage <= 1 ? 'btn disabled' : 'btn-primary' ?>"
+            onclick="window.location.href='<?= BASE_URL ?>asset/view?page=<?= $currentPage - 1 ?>'" <?= $currentPage <= 1 ? 'disabled' : '' ?>>
+            <- Previous </button>
+              <button class="<?= $currentPage >= $totalPages ? 'btn disabled' : 'btn-primary' ?>" <?= ($currentPage >= $totalPages ? 'disabled' : '') ?>
+                onclick="window.location.href='<?= BASE_URL ?>asset/view?page=<?= $currentPage + 1 ?>'">Next →</button>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@
 <?php
 if (isset($pageScripts)) {
     foreach ($pageScripts as $script) {
-        echo "<script src='" . BASE_URL . $script . "'></script>\n";
+        echo "<script src='$script'></script>\n";
     }
 }
 ?>

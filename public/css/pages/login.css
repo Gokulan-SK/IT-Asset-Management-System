@@ -1,12 +1,10 @@
-/* login.css */
-
-/* Global Styles */
 body {
     background-image: url('../../img/login-bg.jpg');
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: 100% 100%;
     background-color: #536788;
+
     overflow: auto;
     color: #FFFFFF;
 }
@@ -16,8 +14,7 @@ h3 {
     margin-bottom: 0 !important;
 }
 
-/* Login Page Container */
-.login-page {
+.flex-container {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -29,8 +26,7 @@ h3 {
     height: 100vh;
 }
 
-/* Login Intro */
-.login-intro {
+.intro-text {
     display: flex;
     flex-direction: column;
     text-align: left;
@@ -39,9 +35,17 @@ h3 {
     padding: 10px;
 }
 
-/* Login Form Container */
-.login-form-container {
-    background-color: rgba(255, 255, 255, 0.8);
+
+
+.icon-header {
+    padding-left: 40px;
+    background: url('../../img/laptop.png') no-repeat left center;
+    background-size: 30px 30px;
+}
+
+
+.form-container {
+    background-color: rgba(255, 255, 255, 1);
     color: #1E293B;
     text-align: left;
     width: 460px;
@@ -49,12 +53,11 @@ h3 {
     padding: 30px;
 }
 
-.login-form-container.login-form {
+.form-container .form {
     width: 100%;
     height: 60%;
 }
 
-/* Input Fields */
 .input-field {
     width: inherit;
 }
@@ -67,6 +70,7 @@ h3 {
     width: 400px;
     border-radius: 8px;
     border: 1px solid #BDBDBD;
+    padding: 12px 8px;
     padding: 16px 12px 8px 12px;
 }
 
@@ -89,11 +93,12 @@ h3 {
     font-size: 13px;
 }
 
+
 .input-group input::placeholder {
     color: #667085;
 }
 
-/* Submit Button */
+
 .submit-button input {
     width: 100%;
     background-color: #0F2BB3;
@@ -110,7 +115,6 @@ h3 {
     background-color: #0D1F8A;
 }
 
-/* Form Footer */
 .form-footer {
     display: flex;
     justify-content: space-between;
@@ -130,12 +134,13 @@ h3 {
     cursor: pointer;
 }
 
-#forgot-pwd {
+a {
     text-decoration: none;
     color: #424242;
     font-size: 13px;
 }
 
-#forgot-pwd:hover {
+a:hover {
     color: #000000;
+
 }

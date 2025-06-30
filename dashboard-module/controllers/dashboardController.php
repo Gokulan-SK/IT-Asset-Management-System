@@ -1,7 +1,7 @@
 <?php
 $viewToInclude = BASE_PATH . "dashboard-module/views/dashboard.php";
 $pageStyles = [
-    BASE_URL . "public/css/dashboard.css",
+    BASE_URL . "public/css/pages/dashboard.css",
 ];
 $pageTitle = "Dashboard";
 

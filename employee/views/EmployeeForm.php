@@ -98,7 +98,7 @@
 
       <div class="label-input">
         <label for="dob">Date of Birth</label>
-        <input type="date" id="dob" min="1950-01-01" max="2007-12-31" name="dob"
+        <input type="date" id="dob" min="1900-01-01" max="2025-12-31" name="dob"
           class="<?= isset($errors['dobError']) ? 'field-error' : '' ?>"
           value="<?= htmlspecialchars($formData['dob'] ?? '') ?>" <?php if (!$isUpdate): ?> required <?php endif; ?> />
         <?php if (!empty($errors['dobError'])): ?>

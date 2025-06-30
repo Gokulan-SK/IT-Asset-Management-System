@@ -7,7 +7,7 @@ require_once BASE_PATH . "utils/validators/AssetValidator.php";
 $viewToInclude = BASE_PATH . "asset/views/asset_form.php";
 $pageTitle = "Add Asset";
 $pageScripts = [
-    "public/js/asset/add-asset.js",
+    BASE_URL . "public/js/asset/add-asset.js",
 ];
 $action = "asset/add";
 $errorMessage = null;
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     ];
 
     //validate data
-    $errors = AssetValidator::validateForCreate($data);
+    $errors = AssetValidator::validateForCreate($conn, $data);
 
     if (isset($imagePath["imageError"])) {
         $errors['imageError'] = $imagePath["imageError"];

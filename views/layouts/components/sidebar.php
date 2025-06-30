@@ -25,15 +25,18 @@
                     <li>
                         <a href="<?= BASE_URL ?>asset/view">View Assets</a>
                     </li>
-                    <li>
-                        <a href="<?= BASE_URL ?>asset/allocate">Allocate Asset</a>
-                    </li>
-                    <!-- <li>
-                    <a href="<?= BASE_URL ?>asset/history"
-                      >Asset History</a
-                    >
-                  </li> -->
+
                 </ul>
+            </li>
+            <li class="has-submenu">
+                <a href="#">Asset Ledger ▾</a>
+                <ul class="submenu hidden">
+                    <li>
+                        <a href="<?= BASE_URL ?>asset-ledger/check-out">Check-Out Asset</a>
+                    </li>
+                    <li>
+                        <a href="<?= BASE_URL ?>asset-ledger/ledger">Asset History</a>
+                    </li>
             </li>
         </ul>
     </nav>

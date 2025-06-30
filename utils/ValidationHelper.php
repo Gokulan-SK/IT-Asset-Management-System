@@ -42,6 +42,53 @@ class ValidationHelper
     {
         return $value === '0' || $value === '1';
     }
+    public static function isValidPhone(string $phone): bool
+    {
+        return preg_match('/^[0-9]{10}$/', $phone);
+    }
+
+    public static function isUnique(mysqli $conn, string $table, string $field, $value, string $uniqueField = null, int $excludeId = null): bool
+    {
+        $valueType = is_numeric($value) ? 'i' : 's';
+        $query = "SELECT count(*) as count FROM $table WHERE $field = ?" . ($excludeId !== null ? " AND $uniqueField != ?" : "");
+        if ($excludeId !== null) {
+            if (!$uniqueField) {
+                error_log("ValidationHelper::isUnique() Error: uniqueField is required when excludeId is provided.");
+                return false;
+            }
+            $query .= " AND `$uniqueField` != ?";
+        }
+        try {
+            $stmt = $conn->prepare($query);
+            if ($excludeId !== null) {
+                $stmt->bind_param($valueType . 'i', $value, $excludeId);
+            } else {
+                $stmt->bind_param("$valueType", $value);
+            }
+
+            if (!$stmt) {
+                error_log("ValidationHelper::isUnique() Error: " . $conn->error);
+                return false;
+            }
+            $stmt->execute();
+            if ($stmt->error) {
+                error_log("ValidationHelper::isUnique() Error: " . $stmt->error);
+                $stmt->close();
+                return false;
+            }
+            $result = $stmt->get_result();
+            $stmt->close();
+            if ($result->fetch_assoc()["count"] > 0) {
+                return false;
+            }
+            return true;
+        } catch (Exception $e) {
+            error_log("ValidationHelper::isUnique() Error:" . $e->getMessage());
+            ;
+            return false;
+        }
+
+    }
 
 
 }

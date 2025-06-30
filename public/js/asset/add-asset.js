@@ -51,7 +51,7 @@ const subcategory = {
     { value: "telephone", text: "Telephone" },
     { value: "fax_machine", text: "Fax Machine" },
   ],
-  other: [], // no subcategories for "other"
+  other: [],
 };
 
 function updateStatusDropdown(categoryKey) {
@@ -95,7 +95,6 @@ function updateSubcategoryDropdown(categoryKey) {
 category.addEventListener("change", function () {
   const selectedCategory = category.value;
 
-  // Reset visibility
   softwareGroup.forEach((group) => group.classList.add("hidden"));
   hardwareGroup.forEach((group) => group.classList.add("hidden"));
 
@@ -114,7 +113,7 @@ category.addEventListener("change", function () {
   } else if (selectedCategory === "other") {
     hardwareGroup.forEach((group) => group.classList.remove("hidden"));
     updateStatusDropdown("hardware");
-    updateSubcategoryDropdown("other"); // will auto-hide dropdown
+    updateSubcategoryDropdown("other");
   } else {
     updateStatusDropdown("hardware");
     updateSubcategoryDropdown("other");
@@ -122,5 +121,63 @@ category.addEventListener("change", function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+  const selectedCategory = category.value;
+  const selectedSubcategory =
+    document.getElementById("subcategory-value")?.value || "";
+  const selectedStatus = document.getElementById("status-value")?.value || "";
+
+  console.log(selectedCategory, selectedSubcategory, selectedStatus);
+
+  softwareGroup.forEach((group) => group.classList.add("hidden"));
+  hardwareGroup.forEach((group) => group.classList.add("hidden"));
   subcategoryContainer.classList.add("hidden");
+
+  if (selectedCategory) {
+    updateSubcategoryDropdown(selectedCategory);
+
+    const selectSubcategoryOption = () => {
+      const found = Array.from(subcategorySelect.options).some((option) => {
+        if (option.value === selectedSubcategory) {
+          option.selected = true;
+          return true;
+        }
+        return false;
+      });
+
+      if (!found && selectedSubcategory) {
+        const fallbackOption = document.createElement("option");
+        fallbackOption.value = selectedSubcategory;
+        fallbackOption.text = selectedSubcategory;
+        fallbackOption.selected = true;
+        subcategorySelect.appendChild(fallbackOption);
+      }
+    };
+
+    selectSubcategoryOption();
+
+    if (selectedCategory === "software") {
+      softwareGroup.forEach((group) => group.classList.remove("hidden"));
+    } else {
+      hardwareGroup.forEach((group) => group.classList.remove("hidden"));
+    }
+
+    if (subcategory[selectedCategory]?.length > 0) {
+      subcategoryContainer.classList.remove("hidden");
+      subcategorySelect.classList.remove("hidden");
+    }
+
+    statusDropdown.innerHTML =
+      '<option value="" disabled>Select a status</option>';
+    const options =
+      statusOptions[
+        selectedCategory === "software" ? "software" : "hardware"
+      ] || [];
+    options.forEach((option) => {
+      const opt = document.createElement("option");
+      opt.value = option.value;
+      opt.textContent = option.text;
+      if (option.value === selectedStatus) opt.selected = true;
+      statusDropdown.appendChild(opt);
+    });
+  }
 });

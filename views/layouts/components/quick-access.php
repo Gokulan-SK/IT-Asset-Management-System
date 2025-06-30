@@ -9,7 +9,7 @@
 
     <a href="<?= BASE_URL ?>asset/view">View Assets</a>
 
-    <a href="<?= BASE_URL ?>asset/allocate">Allocate Asset</a>
+    <a href="<?= BASE_URL ?>asset-ledger/check-out">Check-Out Asset</a>
 
-    <!-- <a href="<?= BASE_URL ?>asset/history">Asset History</a> -->
+    <a href="<?= BASE_URL ?>asset-ledger/ledger">Asset History</a>
 </div>

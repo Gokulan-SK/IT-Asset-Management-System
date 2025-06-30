@@ -95,7 +95,7 @@ class EmployeeValidator
             $errors['usernameError'] = "Username is required.";
         } elseif (!self::isValidUsername($data['username'])) {
             $errors['usernameError'] = "Username can only contain letters, numbers, and underscores.";
-        } elseif (self::isUsernameTaken($conn, $data['username'])) {
+        } elseif (!ValidationHelper::isUnique($conn, 'employee', 'username', $data['username'])) {
             $errors['usernameError'] = "Username already exists.";
         }
 
@@ -111,13 +111,13 @@ class EmployeeValidator
             $errors['emailError'] = "Email is required.";
         } elseif (!self::isValidEmail($data['email'])) {
             $errors['emailError'] = "Invalid email format.";
-        } elseif (self::isEmailTaken($conn, $data['email'])) {
+        } elseif (!ValidationHelper::isUnique($conn, 'employee', 'email', $data['email'])) {
             $errors['emailError'] = "Email already exists.";
         }
 
         if (empty($data['phone']) || !self::isValidPhone($data['phone'])) {
             $errors['phoneError'] = "Phone number is required and must be 10 digits.";
-        } elseif (self::isPhoneTaken($conn, $data['phone'])) {
+        } elseif (!ValidationHelper::isUnique($conn, "employee", 'phone', $data['phone'])) {
             $errors['phoneError'] = "Phone number already exists.";
         }
 

@@ -19,3 +19,12 @@
 .dashboard-table {
     margin-top: 30px;
 }
+
+.workspace {
+    padding: 0px;
+}
+
+.content-frame {
+    margin-top: 0;
+    border-radius: 0;
+}

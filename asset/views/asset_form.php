@@ -9,7 +9,7 @@
     $action = $action ?? 'asset/add';
     $errorMessage = $errorMessage ?? null;
     $formData = $formData ?? [];
-
+    $isUpdate = $action == 'asset/update' ? true : false;
     ?>
 
     <?php if (isset($successMessage)): ?>
@@ -26,19 +26,23 @@
     <?php endif; ?>
 
     <form action="<?= BASE_URL . $action ?>" method="POST" class="form" enctype="multipart/form-data">
-      <input type="hidden" name="asset_id" value="<?= $formData['asset_id'] ?? '' ?>" />
+      <input type="hidden" name="id" value="<?= $formData['asset_id'] ?? '' ?>" />
       <div class="label-input">
-        <label for="name" class=" required">Name</label>
-        <input type="text" name="name" id="name" placeholder="Asset Name" value="<?= $formData['name'] ?? '' ?>"
-          autocomplete="" class="<?= isset($errors['nameError']) ? 'field-error' : '' ?>" required />
+        <label for="name" class="required">Name</label>
+
+        <input type="text" name="name" id="name" placeholder="Asset Name" pattern="^[a-zA-Z0-9 \-_]+$"
+          value="<?= $formData['name'] ?? '' ?>" autocomplete=""
+          class="<?= isset($errors['nameError']) ? 'field-error' : '' ?>" <?php if (!$isUpdate): ?> required <?php endif; ?> />
         <?php if (!empty($errors['nameError'])): ?>
           <p class=" error-text"><?php echo htmlspecialchars($errors['nameError']); ?></p>
         <?php endif; ?>
+
+
       </div>
       <div class="label-input category-dropdown">
         <label for="category" class=" required">Category</label>
-        <select name="category" id="category" class="<?= isset($errors["categoryError"]) ? 'field-error' : ''; ?>"
-          required>
+        <select name="category" id="category" <?php if (!$isUpdate): ?> required <?php endif; ?>
+          class="<?= isset($errors["categoryError"]) ? 'field-error' : ''; ?>">
           <option value="" disabled selected>
             select a category
           </option>
@@ -57,6 +61,8 @@
       <!-- Secondary dropdown (conditionally shown) -->
       <div class="label-input" id="subcategory-dropdown">
         <label for="subcategory" class=" required">Sub Category</label>
+        <input type="hidden" id="subcategory-value" value="<?= htmlspecialchars($formData['subcategory'] ?? '') ?>" />
+
         <select name="subcategory" id="subcategory"
           class="<?= isset($errors["subcategoryError"]) ? 'field-error' : ''; ?>">
           <option value="<?= $formData["subcategory"] ?? '' ?>" selected><?= $formData["subcategory"] ?? '' ?></option>
@@ -65,10 +71,10 @@
           <p class="error-text"><?php echo htmlspecialchars($errors['subcategoryError']); ?></p>
         <?php endif; ?>
       </div>
-      <div class="label-input hardware">
+      <div class="label-input hardware hidden">
         <label for="serial-number" class=" required">Serial Number</label>
         <input type="text" name="serial-number" id="serial-number" placeholder="Serial Number"
-          value="<?= $formData['serialNumber'] ?? '' ?>" autocomplete=""
+          value="<?= $formData['serialNumber'] ?? '' ?>" autocomplete="" $pattern="/^[a-zA-Z0-9\-\/:\._\*\+ ]{6,50}$/"
           class="<?= isset($errors["serialNumberError"]) ? 'field-error' : ''; ?>" />
         <?php if (!empty($errors['serialNumberError'])): ?>
           <p class="error-text"><?php echo htmlspecialchars($errors['serialNumberError']); ?></p>
@@ -76,7 +82,8 @@
       </div>
       <div class="label-input">
         <label for="purchase-date">Purchase Date</label>
-        <input type="date" name="purchase-date" id="purchase-date" value="<?= $formData['purchaseDate'] ?? '' ?>"
+        <input type="date" min="1900-01-01" name="purchase-date" id="purchase-date"
+          value="<?= $formData['purchaseDate'] ?? '' ?>"
           class="<?= isset($errors["purchaseDateError"]) ? 'field-error' : ''; ?>" />
         <?php if (isset($errors['purchaseDateError'])): ?>
           <p class="error-text"><?php echo htmlspecialchars($errors['purchaseDateError']); ?></p>
@@ -90,7 +97,7 @@
           <p class="error-text"><?php echo htmlspecialchars($errors['notesError']); ?></p>
         <?php endif; ?>
       </div>
-      <div class="label-input hardware">
+      <div class="label-input hardware hidden">
         <label for="warranty-period">Warranty Period in Months</label>
         <input type="number" name="warranty-period" id="warranty-period" placeholder="Warranty Period in Months"
           class="<?= isset($errors['warrantyPeriodError']) ? 'field-error' : ''; ?>" min="0" max="120"
@@ -99,7 +106,7 @@
           <p class="error-text"><?php echo htmlspecialchars($errors['warrantyPeriodError']); ?></p>
         <?php endif; ?>
       </div>
-      <div class="label-input hardware">
+      <div class="label-input hardware hidden">
         <label for="condition">Asset Condition</label>
         <select name="condition" id="condition" class="<?= isset($errors['conditionError']) ? 'field-error' : ''; ?>">
           <option value="new" <?= $formData["assetCondition"] ?? '' === "new" ? "selected" : "" ?> default>New</option>
@@ -113,18 +120,19 @@
           <p class="error-text"><?php echo htmlspecialchars($errors['conditionError']); ?></p>
         <?php endif; ?>
       </div>
-      <div class="label-input software">
+      <div class="label-input software hidden">
         <label for="license-key" class=" required">License Key</label>
         <input type="text" name="license-key" id="license-key" placeholder="License Key"
+          pattern="/^[A-Za-z0-9\_\.+=\[\]\{\}\(\):;,<>\?~\`!\@\#\$\%\^\&\*\|\- ]{12,64}$/"
           value="<?= $formData['licenseKey'] ?? '' ?>" autocomplete=""
           class="<?= isset($errors['licenseKeyError']) ? 'field-error' : ''; ?>" />
         <?php if (!empty($errors['licenseKeyError'])): ?>
           <p class="error-text"><?php echo htmlspecialchars($errors['licenseKeyError']); ?></p>
         <?php endif; ?>
       </div>
-      <div class="label-input software">
+      <div class="label-input software hidden">
         <label for="license-expiry">License Expiry Date</label>
-        <input type="date" name="license-expiry" id="license-expiry" placeholder="License Expiry Date"
+        <input type="date" name="license-expiry" min="1900-01-01" id="license-expiry" placeholder="License Expiry Date"
           value="<?= $formData['licenseExpiry'] ?? '' ?>" autocomplete=""
           class="<?= isset($errors['licenseExpiryError']) ? 'field-error' : ''; ?>" />
         <?php if (!empty($errors['licenseExpiryError'])): ?>
@@ -133,17 +141,9 @@
       </div>
       <div class="label-input">
         <label for="status">Asset Status</label>
+        <input type="hidden" id="status-value" value="<?= htmlspecialchars($formData['status'] ?? '') ?>" />
         <select name="status" id="status" class="<?= isset($errors['statusError']) ? 'field-error' : ''; ?>">
-          <option value="" disabled <?= empty($formData['assetStatus']) ? 'selected' : '' ?>>Select status</option>
-          <option value="in_use" <?= ($formData['assetStatus'] ?? '') === 'in_use' ? 'selected' : '' ?>>In Use</option>
-          <option value="in_storage" <?= ($formData['assetStatus'] ?? '') === 'in_storage' ? 'selected' : '' ?>>In Storage
-          </option>
-          <option value="under_repair" <?= ($formData['assetStatus'] ?? '') === 'under_repair' ? 'selected' : '' ?>>Under
-            Repair</option>
-          <option value="retired" <?= ($formData['assetStatus'] ?? '') === 'retired' ? 'selected' : '' ?>>Retired</option>
-          <option value="disposed" <?= ($formData['assetStatus'] ?? '') === 'disposed' ? 'selected' : '' ?>>Disposed
-          </option>
-
+          <option value="" disabled selected>select a status</option>
         </select>
         <?php if (!empty($errors['statusError'])): ?>
           <p class="error-text"><?php echo htmlspecialchars($errors['statusError']); ?></p>
@@ -151,7 +151,7 @@
       </div>
       <div class="label-input">
         <label for="unit-price">Unit Price</label>
-        <input type="number" name="unit-price" id="unit-price" placeholder="Unit Price"
+        <input type="number" name="unit-price" id="unit-price" placeholder="Unit Price" min="0"
           value="<?= $formData['unitPrice'] ?? '' ?>" autocomplete=""
           class="<?= isset($errors['unitPriceError']) ? 'field-error' : ''; ?>" />
         <?php if (!empty($errors['unitPriceError'])): ?>
