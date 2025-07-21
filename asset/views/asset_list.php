@@ -65,11 +65,12 @@ $paginationError = $paginationError ?? null;
             <?php foreach ($assets as $asset): ?>
               <tr>
                 <td><?= htmlspecialchars($asset["asset_id"]); ?></td>
-                <td><?= htmlspecialchars($asset["name"]); ?></td>
+                <td><?= htmlspecialchars($asset["asset_name"]); ?></td>
                 <td><?= htmlspecialchars($asset["category"] ?? $asset["subcategory"]); ?></td>
                 <td><?= htmlspecialchars($asset["subcategory"] ?? "-"); ?></td>
                 <td><?= htmlspecialchars($asset["asset_status"] ?? "-"); ?></td>
-                <td>-</td>
+                <td><?= htmlspecialchars($asset["employee_name"] ??
+                  "-") ?></td>
                 <td>
                   <a href="<?= BASE_URL ?>asset/update?id=<?= $asset['asset_id']; ?>">
                     <button class="edit-button">Edit</button>

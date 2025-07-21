@@ -176,7 +176,26 @@ class AssetModel
     public static function getPaginatedAssetList(mysqli $conn, int $limit, int $offset): array
     {
         try {
-            $query = "SELECT a.asset_id, name, a.category, a.subcategory,  a.asset_status,  FROM asset as a join asset_ledger as al on a.asset_id= al.asset_id ORDER BY created_at DESC LIMIT ? OFFSET ?";
+            $query = "
+            SELECT 
+                a.asset_id,
+                a.name AS asset_name,
+                a.category,
+                a.subcategory,
+                a.asset_status,
+                e.emp_id,
+                concat(e.first_name, ' ',
+                e.last_name) as employee_name
+            FROM asset a
+            LEFT JOIN (
+                SELECT *
+                FROM asset_ledger
+                WHERE check_in_date IS NULL
+            ) al ON a.asset_id = al.asset_id
+            LEFT JOIN employee e ON al.emp_id = e.emp_id
+            ORDER BY a.created_at DESC
+             LIMIT ? OFFSET ?
+            ";
             $stmt = $conn->prepare($query);
             $stmt->bind_param("ii", $limit, $offset);
             $stmt->execute();

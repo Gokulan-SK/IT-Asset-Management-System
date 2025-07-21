@@ -7,9 +7,6 @@
         <button type="menu" class="menu-symbol">☰</button>
     </div>
     <div class="header-actions">
-        <div class="search-bar">
-            <input type="text" placeholder="Search..." />
-        </div>
         <div class="notification-bell">
             <a href="#">
                 <img src="<?= BASE_URL ?>public/img/notification-bell.png" alt="Notifications" />

@@ -110,10 +110,38 @@
         <label for="designation">Designation</label>
         <select id="designation" name="designation" <?php if (!$isUpdate): ?> required <?php endif; ?>>
           <option value="" disabled <?= empty($formData['designation']) ? 'selected' : '' ?>>Select Designation</option>
-          <option value="manager" <?= ($formData['designation'] ?? '') === 'manager' ? 'selected' : '' ?>>Manager</option>
-          <option value="employee" <?= ($formData['designation'] ?? '') === 'employee' ? 'selected' : '' ?>>Employee
           </option>
-          <option value="intern" <?= ($formData['designation'] ?? '') === 'intern' ? 'selected' : '' ?>>Intern</option>
+          <option value="Intern" <?= ($formData['designation'] ?? '') === 'Intern' ? 'selected' : '' ?>>Intern</option>
+          <option value="Junior Developer" <?= ($formData['designation'] ?? '') === 'Junior Developer' ? 'selected' : '' ?>>Junior Developer</option>
+          <option value="Software Developer" <?= ($formData['designation'] ?? '') === 'Software Developer' ? 'selected' : '' ?>>Software Developer</option>
+          <option value="Senior Developer" <?= ($formData['designation'] ?? '') === 'Senior Developer' ? 'selected' : '' ?>>Senior Developer</option>
+          <option value="Tech Lead" <?= ($formData['designation'] ?? '') === 'Tech Lead' ? 'selected' : '' ?>>Tech Lead
+          </option>
+          <option value="QA Engineer" <?= ($formData['designation'] ?? '') === 'QA Engineer' ? 'selected' : '' ?>>QA
+            Engineer</option>
+          <option value="DevOps Engineer" <?= ($formData['designation'] ?? '') === 'DevOps Engineer' ? 'selected' : '' ?>>
+            DevOps Engineer</option>
+          <option value="UI UX Designer" <?= ($formData['designation'] ?? '') === 'UI UX Designer' ? 'selected' : '' ?>>
+            UI UX Designer</option>
+          <option value="Product Designer" <?= ($formData['designation'] ?? '') === 'Product Designer' ? 'selected' : '' ?>>Product Designer</option>
+          <option value="Product Manager" <?= ($formData['designation'] ?? '') === 'Product Manager' ? 'selected' : '' ?>>
+            Product Manager</option>
+          <option value="Project Manager" <?= ($formData['designation'] ?? '') === 'Project Manager' ? 'selected' : '' ?>>
+            Project Manager</option>
+          <option value="Business Analyst" <?= ($formData['designation'] ?? '') === 'Business Analyst' ? 'selected' : '' ?>>Business Analyst</option>
+          <option value="IT Support Exceutive" <?= ($formData['designation'] ?? 'IT Support Exceutive') === '' ? 'selected' : '' ?>>IT Support
+            Executive</option>
+          <option value="System Admin" <?= ($formData['designation'] ?? '') === 'System Admin' ? 'selected' : '' ?>>System
+            Administrator</option>
+          <option value="HR Executive" <?= ($formData['designation'] ?? '') === 'HR Executive' ? 'selected' : '' ?>>HR
+            Executive</option>
+          <option value="Operations Manager" <?= ($formData['designation'] ?? '') === 'Operations Manager' ? 'selected' : '' ?>>Operations Manager</option>
+          <option value="Admin Executive" <?= ($formData['designation'] ?? '') === 'Admin Executive' ? 'selected' : '' ?>>
+            Admin Executive</option>
+          <option value="Team Lead" <?= ($formData['designation'] ?? '') === 'Team Lead' ? 'selected' : '' ?>>Team Lead
+          </option>
+          <option value="CTO" <?= ($formData['designation'] ?? '') === 'CTO' ? 'selected' : '' ?>>CTO</option>
+          <option value="CEO" <?= ($formData['designation'] ?? '') === 'CEO' ? 'selected' : '' ?>>CEO</option>
         </select>
         <?php if (isset($errors['designationError'])): ?>
           <p class="error-text"><?php echo htmlspecialchars($errors['designationError']); ?></p>
