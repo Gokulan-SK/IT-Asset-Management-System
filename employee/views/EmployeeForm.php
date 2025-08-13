@@ -110,7 +110,6 @@
         <label for="designation">Designation</label>
         <select id="designation" name="designation" <?php if (!$isUpdate): ?> required <?php endif; ?>>
           <option value="" disabled <?= empty($formData['designation']) ? 'selected' : '' ?>>Select Designation</option>
-          </option>
           <option value="Intern" <?= ($formData['designation'] ?? '') === 'Intern' ? 'selected' : '' ?>>Intern</option>
           <option value="Junior Developer" <?= ($formData['designation'] ?? '') === 'Junior Developer' ? 'selected' : '' ?>>Junior Developer</option>
           <option value="Software Developer" <?= ($formData['designation'] ?? '') === 'Software Developer' ? 'selected' : '' ?>>Software Developer</option>
@@ -129,8 +128,7 @@
           <option value="Project Manager" <?= ($formData['designation'] ?? '') === 'Project Manager' ? 'selected' : '' ?>>
             Project Manager</option>
           <option value="Business Analyst" <?= ($formData['designation'] ?? '') === 'Business Analyst' ? 'selected' : '' ?>>Business Analyst</option>
-          <option value="IT Support Exceutive" <?= ($formData['designation'] ?? 'IT Support Exceutive') === '' ? 'selected' : '' ?>>IT Support
-            Executive</option>
+          <option value="IT Support Executive" <?= ($formData['designation'] ?? '') === 'IT Support Executive' ? 'selected' : '' ?>>IT Support Executive</option>
           <option value="System Admin" <?= ($formData['designation'] ?? '') === 'System Admin' ? 'selected' : '' ?>>System
             Administrator</option>
           <option value="HR Executive" <?= ($formData['designation'] ?? '') === 'HR Executive' ? 'selected' : '' ?>>HR

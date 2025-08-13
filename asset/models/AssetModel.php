@@ -184,8 +184,10 @@ class AssetModel
                 a.subcategory,
                 a.asset_status,
                 e.emp_id,
-                concat(e.first_name, ' ',
-                e.last_name) as employee_name
+                CASE 
+                    WHEN e.is_deleted = 1 THEN CONCAT(e.first_name, ' ', e.last_name, ' (Deleted)')
+                    ELSE CONCAT(e.first_name, ' ', e.last_name)
+                END as employee_name
             FROM asset a
             LEFT JOIN (
                 SELECT *

@@ -56,7 +56,10 @@ class AssetLedgerModel
                 al.asset_id,
                 a.name,
                 al.emp_id,
-                e.first_name AS first_name,
+                CASE 
+                    WHEN e.is_deleted = 1 THEN CONCAT(e.first_name, ' (Deleted)')
+                    ELSE e.first_name
+                END AS first_name,
                 al.check_out_date,
                 al.check_in_date
             FROM asset_ledger al

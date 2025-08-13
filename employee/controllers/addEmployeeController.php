@@ -2,6 +2,11 @@
 require_once BASE_PATH . 'utils/validators/EmployeeValidator.php';
 require_once BASE_PATH . 'employee/models/EmployeeModel.php';
 
+// Start session if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 $viewToInclude = BASE_PATH . "employee/views/EmployeeForm.php";
 $pageTitle = "Add Employee";
 
@@ -33,11 +38,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($result) {
         $_SESSION['success'] = "Employee added successfully.";
-        $formData = null;
         header("Location: " . BASE_URL . "employee/view");
         exit;
     } else {
-        $errorMessage = "Error adding employee.";
+        $errorMessage = "Error adding employee. Please try again.";
         require BASE_PATH . "views/layouts/layout.php";
         exit;
     }

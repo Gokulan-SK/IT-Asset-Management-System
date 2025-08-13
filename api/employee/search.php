@@ -21,7 +21,8 @@ $searchTerm = "%$term%";
 
 $sql = "SELECT emp_id, first_name, last_name 
         FROM employee 
-        WHERE emp_id LIKE ? OR first_name LIKE ? OR last_name LIKE ? 
+        WHERE (emp_id LIKE ? OR first_name LIKE ? OR last_name LIKE ?) 
+        AND is_deleted = 0
         LIMIT 20";
 
 $stmt = $conn->prepare($sql);

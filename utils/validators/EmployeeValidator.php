@@ -34,7 +34,7 @@ class EmployeeValidator
 
     public static function isUsernameTaken(mysqli $conn, string $username, int $excludeId = null): bool
     {
-        $query = "SELECT username FROM employee WHERE username = ?" . ($excludeId !== null ? " AND emp_id != ?" : "");
+        $query = "SELECT username FROM employee WHERE username = ? AND is_deleted = 0" . ($excludeId !== null ? " AND emp_id != ?" : "");
         $stmt = $conn->prepare($query);
 
         if ($excludeId !== null) {
@@ -52,7 +52,7 @@ class EmployeeValidator
 
     public static function isEmailTaken(mysqli $conn, string $email, int $excludeId = null): bool
     {
-        $query = "SELECT emp_id FROM employee WHERE email = ?" . ($excludeId !== null ? " AND emp_id != ?" : "");
+        $query = "SELECT emp_id FROM employee WHERE email = ? AND is_deleted = 0" . ($excludeId !== null ? " AND emp_id != ?" : "");
         $stmt = $conn->prepare($query);
 
         if ($excludeId !== null) {
@@ -70,7 +70,7 @@ class EmployeeValidator
 
     public static function isPhoneTaken(mysqli $conn, string $phone, int $excludeId = null): bool
     {
-        $query = "SELECT emp_id FROM employee WHERE phone = ?" . ($excludeId !== null ? " AND emp_id != ?" : "");
+        $query = "SELECT emp_id FROM employee WHERE phone = ? AND is_deleted = 0" . ($excludeId !== null ? " AND emp_id != ?" : "");
         $stmt = $conn->prepare($query);
 
         if ($excludeId !== null) {
@@ -95,7 +95,7 @@ class EmployeeValidator
             $errors['usernameError'] = "Username is required.";
         } elseif (!self::isValidUsername($data['username'])) {
             $errors['usernameError'] = "Username can only contain letters, numbers, and underscores.";
-        } elseif (!ValidationHelper::isUnique($conn, 'employee', 'username', $data['username'])) {
+        } elseif (!ValidationHelper::isUnique($conn, 'employee', 'username', $data['username'], 'emp_id')) {
             $errors['usernameError'] = "Username already exists.";
         }
 
@@ -111,13 +111,13 @@ class EmployeeValidator
             $errors['emailError'] = "Email is required.";
         } elseif (!self::isValidEmail($data['email'])) {
             $errors['emailError'] = "Invalid email format.";
-        } elseif (!ValidationHelper::isUnique($conn, 'employee', 'email', $data['email'])) {
+        } elseif (!ValidationHelper::isUnique($conn, 'employee', 'email', $data['email'], 'emp_id')) {
             $errors['emailError'] = "Email already exists.";
         }
 
         if (empty($data['phone']) || !self::isValidPhone($data['phone'])) {
             $errors['phoneError'] = "Phone number is required and must be 10 digits.";
-        } elseif (!ValidationHelper::isUnique($conn, "employee", 'phone', $data['phone'])) {
+        } elseif (!ValidationHelper::isUnique($conn, "employee", 'phone', $data['phone'], 'emp_id')) {
             $errors['phoneError'] = "Phone number already exists.";
         }
 
@@ -149,49 +149,76 @@ class EmployeeValidator
         $errors = [];
         $data = array_map('trim', $data);
 
-        if (!empty($data['username']) && (!self::isValidUsername($data['username']) || self::isUsernameTaken($conn, $data['username'], $emp_id))) {
-            $errors['usernameError'] = "Invalid or duplicate username.";
+        // Username validation
+        if (empty($data['username'])) {
+            $errors['usernameError'] = "Username is required.";
+        } elseif (!self::isValidUsername($data['username'])) {
+            $errors['usernameError'] = "Username can only contain letters, numbers, and underscores.";
+        } elseif (self::isUsernameTaken($conn, $data['username'], $emp_id)) {
+            $errors['usernameError'] = "Username already exists.";
         }
 
-        if (!empty($data['first-name']) && !ValidationHelper::isAlphabeticString($data['first-name'])) {
+        // First name validation
+        if (empty($data['first-name'])) {
+            $errors['firstNameError'] = "First name is required.";
+        } elseif (!ValidationHelper::isAlphabeticString($data['first-name'])) {
             $errors['firstNameError'] = "First name can only contain letters.";
         }
 
-        if (!empty($data['last-name']) && !ValidationHelper::isAlphabeticString($data['last-name'])) {
+        // Last name validation
+        if (empty($data['last-name'])) {
+            $errors['lastNameError'] = "Last name is required.";
+        } elseif (!ValidationHelper::isAlphabeticString($data['last-name'])) {
             $errors['lastNameError'] = "Last name can only contain letters.";
         }
 
-        if (!empty($data['email'])) {
-            if (!self::isValidEmail($data['email'])) {
-                $errors['emailError'] = "Invalid email format.";
-            } elseif (self::isEmailTaken($conn, $data['email'], $emp_id)) {
-                $errors['emailError'] = "Email already exists.";
+        // Email validation
+        if (empty($data['email'])) {
+            $errors['emailError'] = "Email is required.";
+        } elseif (!self::isValidEmail($data['email'])) {
+            $errors['emailError'] = "Invalid email format.";
+        } elseif (self::isEmailTaken($conn, $data['email'], $emp_id)) {
+            $errors['emailError'] = "Email already exists.";
+        }
+
+        // Password validation (optional for update)
+        if (!empty($data['password']) || !empty($data['confirm-password'])) {
+            if (empty($data['password']) || empty($data['confirm-password'])) {
+                $errors['passwordError'] = "Both password and confirm password are required when updating password.";
+            } elseif ($data['password'] !== $data['confirm-password']) {
+                $errors['passwordError'] = "Passwords do not match.";
+            } elseif (!self::isValidPassword($data['password'])) {
+                $errors['passwordError'] = "Password must meet complexity requirements.";
             }
         }
 
-        if ((!empty($data['password']) && (!empty($data['confirm-password']))) && ($data['password'] !== $data['confirm-password'])) {
-            $errors['passwordError'] = "Passwords do not match.";
-        } elseif (!empty($data['password']) && !self::isValidPassword($data['password'])) {
-            $errors['passwordError'] = "Password must meet complexity requirements.";
+        // Phone validation
+        if (empty($data['phone'])) {
+            $errors['phoneError'] = "Phone number is required.";
+        } elseif (!self::isValidPhone($data['phone'])) {
+            $errors['phoneError'] = "Phone number must be 10 digits.";
+        } elseif (self::isPhoneTaken($conn, $data['phone'], $emp_id)) {
+            $errors['phoneError'] = "Phone number already exists.";
         }
 
-        if (!empty($data['phone'])) {
-            if (!self::isValidPhone($data['phone'])) {
-                $errors['phoneError'] = "Invalid phone number format.";
-            } elseif (self::isPhoneTaken($conn, $data['phone'], $emp_id)) {
-                $errors['phoneError'] = "Phone number already exists.";
-            }
-        }
-
-        if (!empty($data['dob']) && !ValidationHelper::isValidDate($data['dob'])) {
+        // DOB validation
+        if (empty($data['dob'])) {
+            $errors['dobError'] = "Date of Birth is required.";
+        } elseif (!ValidationHelper::isValidDate($data['dob'])) {
             $errors['dobError'] = "Invalid date format.";
         }
 
-        if (!empty($data['designation']) && !self::isValidDesignation($data['designation'])) {
+        // Designation validation
+        if (empty($data['designation'])) {
+            $errors['designationError'] = "Designation is required.";
+        } elseif (!self::isValidDesignation($data['designation'])) {
             $errors['designationError'] = "Invalid designation format.";
         }
 
-        if (isset($data['is-admin']) && !ValidationHelper::isValidBinary($data['is-admin'])) {
+        // Admin status validation
+        if (!isset($data['is-admin'])) {
+            $errors['is-adminError'] = "Admin status is required.";
+        } elseif (!ValidationHelper::isValidBinary($data['is-admin'])) {
             $errors['is-adminError'] = "Is Admin must be either 0 or 1.";
         }
 

@@ -49,45 +49,47 @@ class ValidationHelper
 
     public static function isUnique(mysqli $conn, string $table, string $field, $value, string $uniqueField = null, int $excludeId = null): bool
     {
-        $valueType = is_numeric($value) ? 'i' : 's';
-        $query = "SELECT count(*) as count FROM $table WHERE $field = ?" . ($excludeId !== null ? " AND $uniqueField != ?" : "");
-        if ($excludeId !== null) {
-            if (!$uniqueField) {
-                error_log("ValidationHelper::isUnique() Error: uniqueField is required when excludeId is provided.");
-                return false;
-            }
-            $query .= " AND `$uniqueField` != ?";
-        }
         try {
-            $stmt = $conn->prepare($query);
-            if ($excludeId !== null) {
-                $stmt->bind_param($valueType . 'i', $value, $excludeId);
-            } else {
-                $stmt->bind_param("$valueType", $value);
+            $valueType = is_numeric($value) ? 'i' : 's';
+            $query = "SELECT count(*) as count FROM $table WHERE $field = ?";
+            
+            // Add soft deletion check for employee table
+            if ($table === 'employee') {
+                $query .= " AND is_deleted = 0";
             }
-
+            
+            if ($excludeId !== null && $uniqueField !== null) {
+                $query .= " AND `$uniqueField` != ?";
+            }
+            
+            $stmt = $conn->prepare($query);
             if (!$stmt) {
                 error_log("ValidationHelper::isUnique() Error: " . $conn->error);
                 return false;
             }
+            
+            if ($excludeId !== null && $uniqueField !== null) {
+                $stmt->bind_param($valueType . 'i', $value, $excludeId);
+            } else {
+                $stmt->bind_param($valueType, $value);
+            }
+            
             $stmt->execute();
             if ($stmt->error) {
                 error_log("ValidationHelper::isUnique() Error: " . $stmt->error);
                 $stmt->close();
                 return false;
             }
+            
             $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
             $stmt->close();
-            if ($result->fetch_assoc()["count"] > 0) {
-                return false;
-            }
-            return true;
+            
+            return $row["count"] == 0;
         } catch (Exception $e) {
             error_log("ValidationHelper::isUnique() Error:" . $e->getMessage());
-            ;
             return false;
         }
-
     }
 
 

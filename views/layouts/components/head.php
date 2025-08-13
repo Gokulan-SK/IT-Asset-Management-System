@@ -14,5 +14,10 @@
         }
     }
     ?>
+    
+    <!-- Define BASE_URL for JavaScript -->
+    <script>
+        window.BASE_URL = '<?= BASE_URL ?>';
+    </script>
 
 </head>
