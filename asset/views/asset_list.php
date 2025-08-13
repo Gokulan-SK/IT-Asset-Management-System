@@ -1,35 +1,56 @@
 <?php
-include BASE_PATH . "views/layouts/components/quick-access.php";
+include BASE_PATH . "views/layouts/components/quick-access.php"; ?>
 
+<?php
 $assets = $assets ?? [];
 $totalRecordsCount = $totalRecordsCount ?? 0;
 $currentPage = $currentPage ?? 1;
 $totalPages = $totalPages ?? 1;
 $paginationError = $paginationError ?? null;
+$search = $search ?? '';
+$statusFilter = $statusFilter ?? '';
+$categoryFilter = $categoryFilter ?? '';
+$sort = $sort ?? 'asset_id';
+$order = $order ?? 'ASC';
+$limit = $limit ?? 10;
 ?>
 <div class="content-frame">
   <div class="table-container">
     <div class="table-header">
       <div class="table-heading">
         <h3>Assets</h3>
+        <span class="record-count">(<?= $totalRecordsCount ?> records found)</span>
       </div>
       <div class="table-actions">
-        <div class="search-bar">
-          <input type="text" placeholder="Search by name, category, status..." name="table-search" id="table-search"
-            disabled />
-        </div>
-        <div class="filter-bar">
-          <select id="status-filter" disabled>
-            <option value="all">All</option>
-            <option value="available">Available</option>
-            <option value="assigned">Assigned</option>
-            <option value="under-maintenance">Under Maintenance</option>
-            <option value="disposed">Disposed</option>
-            <option value="new">New</option>
-            <option value="good">Good</option>
-            <option value="repair-needed">Repair Needed</option>
-            <option value="damaged">Damaged</option>
-          </select>
+        <div class="search-filter-row">
+          <div class="search-bar">
+            <input type="text" placeholder="Search assets..." name="table-search" id="table-search"
+              value="<?= htmlspecialchars($search) ?>" />
+            <button type="button" id="clear-search" class="clear-btn" title="Clear search">×</button>
+          </div>
+          <div class="filter-bar">
+            <select id="status-filter">
+              <option value="">All Statuses</option>
+              <option value="available" <?= $statusFilter === 'available' ? 'selected' : '' ?>>Available</option>
+              <option value="assigned" <?= $statusFilter === 'assigned' ? 'selected' : '' ?>>Assigned</option>
+              <option value="under-maintenance" <?= $statusFilter === 'under-maintenance' ? 'selected' : '' ?>>Under
+                Maintenance</option>
+              <option value="disposed" <?= $statusFilter === 'disposed' ? 'selected' : '' ?>>Disposed</option>
+              <option value="new" <?= $statusFilter === 'new' ? 'selected' : '' ?>>New</option>
+              <option value="good" <?= $statusFilter === 'good' ? 'selected' : '' ?>>Good</option>
+              <option value="repair-needed" <?= $statusFilter === 'repair-needed' ? 'selected' : '' ?>>Repair Needed
+              </option>
+              <option value="damaged" <?= $statusFilter === 'damaged' ? 'selected' : '' ?>>Damaged</option>
+            </select>
+          </div>
+          <div class="export-actions">
+            <button type="button" id="export-csv" class="btn-secondary" title="Export to CSV">
+              📊 Export CSV
+            </button>
+            <button type="button" id="reset-filters" class="btn-secondary" title="Reset all filters">
+              🔄 Reset
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -51,13 +72,48 @@ $paginationError = $paginationError ?? null;
       <table>
         <thead>
           <tr>
-            <th id="table-primary-id">Asset ID</th>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Subcategory</th>
-            <th>Status</th>
-            <th>Assigned To</th>
-            <th>Actions</th>
+            <th class="sortable <?= $sort === 'asset_id' ? 'sorted-' . strtolower($order) : '' ?>" data-sort="asset_id">
+              ASSET ID
+              <span class="sort-indicator">
+                <?= $sort === 'asset_id' ? ($order === 'ASC' ? '▲' : '▼') : '↕' ?>
+              </span>
+            </th>
+            <th class="sortable <?= $sort === 'asset_name' ? 'sorted-' . strtolower($order) : '' ?>"
+              data-sort="asset_name">
+              ASSET NAME
+              <span class="sort-indicator">
+                <?= $sort === 'asset_name' ? ($order === 'ASC' ? '▲' : '▼') : '↕' ?>
+              </span>
+            </th>
+            <th class="sortable <?= $sort === 'category' ? 'sorted-' . strtolower($order) : '' ?>" data-sort="category">
+              CATEGORY
+              <span class="sort-indicator">
+                <?= $sort === 'category' ? ($order === 'ASC' ? '▲' : '▼') : '↕' ?>
+              </span>
+            </th>
+            <th class="sortable <?= $sort === 'subcategory' ? 'sorted-' . strtolower($order) : '' ?>"
+              data-sort="subcategory">
+              SUBCATEGORY
+              <span class="sort-indicator">
+                <?= $sort === 'subcategory' ? ($order === 'ASC' ? '▲' : '▼') : '↕' ?>
+              </span>
+            </th>
+            <th class="sortable <?= $sort === 'asset_status' ? 'sorted-' . strtolower($order) : '' ?>"
+              data-sort="asset_status">
+              STATUS
+              <span class="sort-indicator">
+                <?= $sort === 'asset_status' ? ($order === 'ASC' ? '▲' : '▼') : '↕' ?>
+              </span>
+            </th>
+            <th class="sortable <?= $sort === 'purchase_date' ? 'sorted-' . strtolower($order) : '' ?>"
+              data-sort="purchase_date">
+              PURCHASE DATE
+              <span class="sort-indicator">
+                <?= $sort === 'purchase_date' ? ($order === 'ASC' ? '▲' : '▼') : '↕' ?>
+              </span>
+            </th>
+            <th>ASSIGNED TO</th>
+            <th>ACTIONS</th>
           </tr>
         </thead>
         <tbody>
@@ -66,22 +122,31 @@ $paginationError = $paginationError ?? null;
               <tr>
                 <td><?= htmlspecialchars($asset["asset_id"]); ?></td>
                 <td><?= htmlspecialchars($asset["asset_name"]); ?></td>
-                <td><?= htmlspecialchars($asset["category"] ?? $asset["subcategory"]); ?></td>
+                <td><?= htmlspecialchars($asset["category"]); ?></td>
                 <td><?= htmlspecialchars($asset["subcategory"] ?? "-"); ?></td>
-                <td><?= htmlspecialchars($asset["asset_status"] ?? "-"); ?></td>
-                <td><?= htmlspecialchars($asset["employee_name"] ??
-                  "-") ?></td>
-                <td>
-                  <a href="<?= BASE_URL ?>asset/update?id=<?= $asset['asset_id']; ?>">
-                    <button class="edit-button">Edit</button>
+                <td><?= htmlspecialchars($asset["asset_status"]); ?></td>
+                <td><?= htmlspecialchars($asset["purchase_date"] ?? "-"); ?></td>
+                <td><?= htmlspecialchars($asset["employee_name"] ?? "Not Assigned") ?></td>
+                <td class="action-buttons">
+                  <a href="<?= BASE_URL ?>asset/update?id=<?= $asset['asset_id']; ?>" class="edit-btn" title="Edit Asset">
+                    <img src="<?= BASE_URL ?>public/img/edit-icon.png" alt="Edit" width="16" height="16">
                   </a>
-                  <button class="delete-button" data-id="<?= $asset['asset_id']; ?>">Delete</button>
+                  <button class="delete-btn" data-id="<?= $asset['asset_id']; ?>" title="Delete Asset">
+                    <img src="<?= BASE_URL ?>public/img/delete-icon.png" alt="Delete" width="16" height="16">
+                  </button>
                 </td>
               </tr>
             <?php endforeach; ?>
           <?php else: ?>
             <tr>
-              <td colspan="6" style="text-align:center;">No asset records found.</td>
+              <td colspan="8" style="text-align:center;">
+                <?php if (!empty($search) || !empty($statusFilter) || !empty($categoryFilter)): ?>
+                  No assets found matching your criteria. <button type="button" id="reset-filters-inline"
+                    class="reset-link">Clear filters</button>
+                <?php else: ?>
+                  No asset records found.
+                <?php endif; ?>
+              </td>
             </tr>
           <?php endif; ?>
         </tbody>
@@ -99,6 +164,7 @@ $paginationError = $paginationError ?? null;
           <?php
           $limit = 10;
           $offset = ($currentPage - 1) * $limit;
+
           if ($totalRecordsCount === 0) {
             echo "0-0 of 0";
           } else {
@@ -108,22 +174,22 @@ $paginationError = $paginationError ?? null;
           }
           ?>
         </span>
-
         <div class="pagination-buttons">
-          <button class="<?= $currentPage <= 1 ? 'btn disabled' : 'btn-primary' ?>"
-            onclick="window.location.href='<?= BASE_URL ?>asset/view?page=<?= $currentPage - 1 ?>'" <?= $currentPage <= 1 ? 'disabled' : '' ?>>
-            <- Previous </button>
-              <button class="<?= $currentPage >= $totalPages ? 'btn disabled' : 'btn-primary' ?>" <?= ($currentPage >= $totalPages ? 'disabled' : '') ?>
-                onclick="window.location.href='<?= BASE_URL ?>asset/view?page=<?= $currentPage + 1 ?>'">Next →</button>
+          <button class="<?= $currentPage <= 1 ? 'btn disabled' : 'btn-primary' ?>" <?php echo ($currentPage <= 1 ? 'disabled' : '') ?> onclick="window.AssetListManager.changePage(<?= $currentPage - 1 ?>)">
+            ← Previous
+          </button>
+          <button class="<?= $currentPage >= $totalPages ? 'btn disabled' : 'btn-primary ' ?>" <?= $currentPage >= $totalPages ? 'disabled' : '' ?> onclick="window.AssetListManager.changePage(<?= $currentPage + 1 ?>)">
+            Next →
+          </button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Delete confirmation modal -->
+<!-- Delete confirmation popup -->
 <div class="modal" id="delete-modal">
-  <form id="delete-form" class="modal-content" method="POST">
+  <form id="delete-form" class="modal-content" method="POST" action="">
     <input type="hidden" name="id" id="delete-item-id" />
     <span class="modal-closebtn">&times;</span>
     <h2>Delete Asset</h2>

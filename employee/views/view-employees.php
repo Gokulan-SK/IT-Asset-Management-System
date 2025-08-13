@@ -23,19 +23,45 @@ $order = $order ?? 'ASC';
       <div class="table-actions">
         <div class="search-filter-row">
           <div class="search-bar">
-            <input type="text" placeholder="Search employees..." name="table-search" id="table-search" 
-                   value="<?= htmlspecialchars($search) ?>" />
+            <input type="text" placeholder="Search employees..." name="table-search" id="table-search"
+              value="<?= htmlspecialchars($search) ?>" />
             <button type="button" id="clear-search" class="clear-btn" title="Clear search">×</button>
           </div>
           <div class="filter-bar">
             <select id="designation-filter">
               <option value="">All Designations</option>
-              <?php foreach ($designations as $designation): ?>
-                <option value="<?= htmlspecialchars($designation) ?>" 
-                        <?= $filter === $designation ? 'selected' : '' ?>>
-                  <?= htmlspecialchars($designation) ?>
-                </option>
-              <?php endforeach; ?>
+              <option value="Intern" <?= $filter === 'Intern' ? 'selected' : '' ?>>Intern</option>
+              <option value="Junior Developer" <?= $filter === 'Junior Developer' ? 'selected' : '' ?>>Junior Developer
+              </option>
+              <option value="Software Developer" <?= $filter === 'Software Developer' ? 'selected' : '' ?>>Software
+                Developer</option>
+              <option value="Senior Developer" <?= $filter === 'Senior Developer' ? 'selected' : '' ?>>Senior Developer
+              </option>
+              <option value="Tech Lead" <?= $filter === 'Tech Lead' ? 'selected' : '' ?>>Tech Lead</option>
+              <option value="QA Engineer" <?= $filter === 'QA Engineer' ? 'selected' : '' ?>>QA Engineer</option>
+              <option value="DevOps Engineer" <?= $filter === 'DevOps Engineer' ? 'selected' : '' ?>>DevOps Engineer
+              </option>
+              <option value="UI UX Designer" <?= $filter === 'UI UX Designer' ? 'selected' : '' ?>>UI UX Designer</option>
+              <option value="Product Designer" <?= $filter === 'Product Designer' ? 'selected' : '' ?>>Product Designer
+              </option>
+              <option value="Product Manager" <?= $filter === 'Product Manager' ? 'selected' : '' ?>>Product Manager
+              </option>
+              <option value="Project Manager" <?= $filter === 'Project Manager' ? 'selected' : '' ?>>Project Manager
+              </option>
+              <option value="Business Analyst" <?= $filter === 'Business Analyst' ? 'selected' : '' ?>>Business Analyst
+              </option>
+              <option value="IT Support Executive" <?= $filter === 'IT Support Executive' ? 'selected' : '' ?>>IT Support
+                Executive</option>
+              <option value="System Admin" <?= $filter === 'System Admin' ? 'selected' : '' ?>>System Administrator
+              </option>
+              <option value="HR Executive" <?= $filter === 'HR Executive' ? 'selected' : '' ?>>HR Executive</option>
+              <option value="Operations Manager" <?= $filter === 'Operations Manager' ? 'selected' : '' ?>>Operations
+                Manager</option>
+              <option value="Admin Executive" <?= $filter === 'Admin Executive' ? 'selected' : '' ?>>Admin Executive
+              </option>
+              <option value="Team Lead" <?= $filter === 'Team Lead' ? 'selected' : '' ?>>Team Lead</option>
+              <option value="CTO" <?= $filter === 'CTO' ? 'selected' : '' ?>>CTO</option>
+              <option value="CEO" <?= $filter === 'CEO' ? 'selected' : '' ?>>CEO</option>
             </select>
           </div>
           <div class="export-actions">
@@ -62,48 +88,45 @@ $order = $order ?? 'ASC';
         <p><?= htmlspecialchars($errorMessage); ?></p>
       </div>
     <?php endif; ?>
-    
+
     <div class="table">
       <table>
         <thead>
           <tr>
-            <th class="sortable <?= $sort === 'emp_id' ? 'sorted-' . strtolower($order) : '' ?>" 
-                data-sort="emp_id">
+            <th class="sortable <?= $sort === 'emp_id' ? 'sorted-' . strtolower($order) : '' ?>" data-sort="emp_id">
               EMPLOYEE ID
               <span class="sort-indicator">
                 <?= $sort === 'emp_id' ? ($order === 'ASC' ? '▲' : '▼') : '↕' ?>
               </span>
             </th>
-            <th class="sortable <?= $sort === 'first_name' ? 'sorted-' . strtolower($order) : '' ?>" 
-                data-sort="first_name">
+            <th class="sortable <?= $sort === 'first_name' ? 'sorted-' . strtolower($order) : '' ?>"
+              data-sort="first_name">
               FIRST NAME
               <span class="sort-indicator">
                 <?= $sort === 'first_name' ? ($order === 'ASC' ? '▲' : '▼') : '↕' ?>
               </span>
             </th>
-            <th class="sortable <?= $sort === 'last_name' ? 'sorted-' . strtolower($order) : '' ?>" 
-                data-sort="last_name">
+            <th class="sortable <?= $sort === 'last_name' ? 'sorted-' . strtolower($order) : '' ?>"
+              data-sort="last_name">
               LAST NAME
               <span class="sort-indicator">
                 <?= $sort === 'last_name' ? ($order === 'ASC' ? '▲' : '▼') : '↕' ?>
               </span>
             </th>
-            <th class="sortable <?= $sort === 'designation' ? 'sorted-' . strtolower($order) : '' ?>" 
-                data-sort="designation">
+            <th class="sortable <?= $sort === 'designation' ? 'sorted-' . strtolower($order) : '' ?>"
+              data-sort="designation">
               DESIGNATION
               <span class="sort-indicator">
                 <?= $sort === 'designation' ? ($order === 'ASC' ? '▲' : '▼') : '↕' ?>
               </span>
             </th>
-            <th class="sortable <?= $sort === 'phone' ? 'sorted-' . strtolower($order) : '' ?>" 
-                data-sort="phone">
+            <th class="sortable <?= $sort === 'phone' ? 'sorted-' . strtolower($order) : '' ?>" data-sort="phone">
               MOBILE NO
               <span class="sort-indicator">
                 <?= $sort === 'phone' ? ($order === 'ASC' ? '▲' : '▼') : '↕' ?>
               </span>
             </th>
-            <th class="sortable <?= $sort === 'email' ? 'sorted-' . strtolower($order) : '' ?>" 
-                data-sort="email">
+            <th class="sortable <?= $sort === 'email' ? 'sorted-' . strtolower($order) : '' ?>" data-sort="email">
               EMAIL ID
               <span class="sort-indicator">
                 <?= $sort === 'email' ? ($order === 'ASC' ? '▲' : '▼') : '↕' ?>
@@ -165,14 +188,10 @@ $order = $order ?? 'ASC';
           ?>
         </span>
         <div class="pagination-buttons">
-          <button class="<?= $currentPage <= 1 ? 'btn disabled' : 'btn-primary' ?>" 
-                  <?php echo ($currentPage <= 1 ? 'disabled' : '') ?>
-                  onclick="navigateToPage(<?= $currentPage - 1 ?>)">
+          <button class="<?= $currentPage <= 1 ? 'btn disabled' : 'btn-primary' ?>" <?php echo ($currentPage <= 1 ? 'disabled' : '') ?> onclick="navigateToPage(<?= $currentPage - 1 ?>)">
             ← Previous
           </button>
-          <button class="<?= $currentPage >= $totalPages ? 'btn disabled' : 'btn-primary ' ?>" 
-                  <?= $currentPage >= $totalPages ? 'disabled' : '' ?>
-                  onclick="navigateToPage(<?= $currentPage + 1 ?>)">
+          <button class="<?= $currentPage >= $totalPages ? 'btn disabled' : 'btn-primary ' ?>" <?= $currentPage >= $totalPages ? 'disabled' : '' ?> onclick="navigateToPage(<?= $currentPage + 1 ?>)">
             Next →
           </button>
         </div>
