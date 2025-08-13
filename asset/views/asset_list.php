@@ -127,12 +127,14 @@ $limit = $limit ?? 10;
                 <td><?= htmlspecialchars($asset["asset_status"]); ?></td>
                 <td><?= htmlspecialchars($asset["purchase_date"] ?? "-"); ?></td>
                 <td><?= htmlspecialchars($asset["employee_name"] ?? "Not Assigned") ?></td>
-                <td class="action-buttons">
-                  <a href="<?= BASE_URL ?>asset/update?id=<?= $asset['asset_id']; ?>" class="edit-btn" title="Edit Asset">
-                    <img src="<?= BASE_URL ?>public/img/edit-icon.png" alt="Edit" width="16" height="16">
+                <td>
+                  <a href="<?= BASE_URL ?>asset/update?id=<?= $asset['asset_id']; ?>" class="btn-link">
+                    <button class="edit-button" title="Edit Asset">
+                      <img src="<?= BASE_URL ?>public/img/edit-icon.png" alt="Edit" />
+                    </button>
                   </a>
-                  <button class="delete-btn" data-id="<?= $asset['asset_id']; ?>" title="Delete Asset">
-                    <img src="<?= BASE_URL ?>public/img/delete-icon.png" alt="Delete" width="16" height="16">
+                  <button class="delete-button" data-id="<?= $asset['asset_id']; ?>" title="Delete Asset">
+                    <img src="<?= BASE_URL ?>public/img/delete-icon.png" alt="Delete" />
                   </button>
                 </td>
               </tr>

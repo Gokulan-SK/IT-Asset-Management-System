@@ -11,6 +11,7 @@ class AssetListManager {
   init() {
     this.bindEvents();
     this.updateUIFromFilters();
+    this.updateDeleteModalActions();
   }
 
   getFiltersFromURL() {
@@ -151,9 +152,6 @@ class AssetListManager {
     } else {
       console.error("Page size select not found!");
     }
-
-    // Delete button functionality
-    this.bindDeleteButtons();
   }
 
   handleSearch(searchTerm) {
@@ -250,7 +248,7 @@ class AssetListManager {
   }
 
   bindDeleteButtons() {
-    const deleteButtons = document.querySelectorAll(".delete-btn");
+    const deleteButtons = document.querySelectorAll(".delete-button");
     console.log("Found delete buttons:", deleteButtons.length);
 
     deleteButtons.forEach((button) => {
@@ -273,35 +271,41 @@ class AssetListManager {
 
   showDeleteModal(assetId) {
     this.currentAssetId = assetId;
-    const modal = document.getElementById("deleteModal");
-    const assetIdSpan = document.getElementById("deleteAssetId");
+    const modal = document.getElementById("delete-modal");
+    const form = document.getElementById("delete-form");
+    const idInput = document.getElementById("delete-item-id");
 
-    if (modal && assetIdSpan) {
-      assetIdSpan.textContent = assetId;
+    if (modal && form && idInput) {
+      idInput.value = assetId;
+      form.action = `${this.baseUrl}asset/delete`;
       modal.style.display = "block";
       console.log("Delete modal shown for asset:", assetId);
     } else {
-      console.error("Delete modal elements not found!");
+      console.error("Delete modal elements not found:", { modal, form, idInput });
     }
 
     // Close modal when clicking outside
-    modal.addEventListener("click", (e) => {
+    window.addEventListener("click", (e) => {
       if (e.target === modal) {
         this.closeDeleteModal();
       }
     });
 
     // Close modal with close button
-    const closeBtn = modal.querySelector(".close");
-    if (closeBtn) {
-      closeBtn.addEventListener("click", () => {
-        this.closeDeleteModal();
-      });
-    }
+    const closeBtn = modal.querySelector(".modal-closebtn");
+    const cancelBtn = modal.querySelector(".cancel-button");
+    
+    [closeBtn, cancelBtn].forEach(btn => {
+      if (btn) {
+        btn.addEventListener("click", () => {
+          this.closeDeleteModal();
+        });
+      }
+    });
   }
 
   closeDeleteModal() {
-    const modal = document.getElementById("deleteModal");
+    const modal = document.getElementById("delete-modal");
     if (modal) {
       modal.style.display = "none";
       this.currentAssetId = null;
@@ -309,23 +313,31 @@ class AssetListManager {
     }
   }
 
-  confirmDelete() {
-    if (this.currentAssetId) {
-      console.log("Confirming delete for asset:", this.currentAssetId);
-      // Create a form and submit it
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = `${this.baseUrl}asset/delete`;
+  updateDeleteModalActions() {
+    const modal = document.getElementById("delete-modal");
+    if (!modal) return;
 
-      const input = document.createElement("input");
-      input.type = "hidden";
-      input.name = "id";
-      input.value = this.currentAssetId;
+    // Close modal functionality
+    const closeBtn = modal.querySelector(".modal-closebtn");
+    const cancelBtn = modal.querySelector(".cancel-button");
+    
+    [closeBtn, cancelBtn].forEach(btn => {
+      if (btn) {
+        btn.addEventListener("click", () => {
+          modal.style.display = "none";
+        });
+      }
+    });
 
-      form.appendChild(input);
-      document.body.appendChild(form);
-      form.submit();
-    }
+    // Close modal when clicking outside
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.style.display = "none";
+      }
+    });
+
+    // Bind delete buttons
+    this.bindDeleteButtons();
   }
 
   changePage(page) {
