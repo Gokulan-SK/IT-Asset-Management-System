@@ -161,7 +161,7 @@
     display: inline-block;
 }
 
-.edit-button, .delete-button {
+.edit-button, .delete-button, .check-in-button {
     padding: 8px;
     margin-right: 5px;
     border: none;
@@ -175,7 +175,7 @@
     height: 32px;
 }
 
-.edit-button img, .delete-button img {
+.edit-button img, .delete-button img, .check-in-button img {
     width: 16px;
     height: 16px;
     filter: brightness(0) invert(1); /* Make icons white */
@@ -197,6 +197,26 @@
 
 .delete-button:hover {
     background-color: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.check-in-button {
+    background-color: #17a2b8; /* Info/cyan color for check-in action */
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: auto;
+    height: auto;
+    min-width: 70px;
+}
+
+.check-in-button:hover {
+    background-color: #138496;
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
@@ -404,4 +424,16 @@
     to {
         transform: rotate(360deg);
     }
+}
+
+/* Asset Ledger specific styles */
+.status-checked-in {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 12px;
+    padding: 4px 8px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    display: inline-block;
 }

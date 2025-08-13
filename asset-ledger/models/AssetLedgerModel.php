@@ -152,6 +152,183 @@ class AssetLedgerModel
         }
     }
 
+    // Enhanced methods for search, filter, and export
+    public static function getLedgerCountWithFilters(mysqli $conn, string $search = '', string $statusFilter = ''): int
+    {
+        try {
+            $query = "SELECT COUNT(al.ledger_id) AS total 
+                     FROM asset_ledger al
+                     JOIN asset a ON al.asset_id = a.asset_id
+                     JOIN employee e ON al.emp_id = e.emp_id
+                     WHERE 1=1";
+            
+            $params = [];
+            $types = '';
+            
+            if (!empty($search)) {
+                $query .= " AND (al.asset_id LIKE ? OR al.emp_id LIKE ? OR a.name LIKE ? OR e.first_name LIKE ? OR e.last_name LIKE ?)";
+                $searchTerm = "%$search%";
+                $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm]);
+                $types .= 'sssss';
+            }
+            
+            if (!empty($statusFilter)) {
+                if ($statusFilter === 'assigned') {
+                    $query .= " AND al.check_in_date IS NULL";
+                } elseif ($statusFilter === 'available') {
+                    $query .= " AND al.check_in_date IS NOT NULL";
+                }
+            }
+            
+            $stmt = $conn->prepare($query);
+            if (!empty($params)) {
+                $stmt->bind_param($types, ...$params);
+            }
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result && $row = $result->fetch_assoc()) {
+                return (int) $row["total"];
+            }
+            return 0;
+        } catch (Exception $e) {
+            error_log("AssetLedgerModel::getLedgerCountWithFilters() Error: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    public static function getPaginatedLedgerListWithFilters(mysqli $conn, int $limit, int $offset, string $search = '', string $statusFilter = '', string $sort = 'ledger_id', string $order = 'ASC'): array
+    {
+        try {
+            // Validate sort column
+            $allowedSortColumns = ['ledger_id', 'asset_id', 'name', 'emp_id', 'first_name', 'check_out_date', 'check_in_date'];
+            if (!in_array($sort, $allowedSortColumns)) {
+                $sort = 'ledger_id';
+            }
+            
+            // Validate order
+            $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC';
+            
+            $query = "SELECT 
+                        al.ledger_id,
+                        al.asset_id,
+                        a.name,
+                        al.emp_id,
+                        e.first_name,
+                        e.last_name,
+                        al.check_out_date,
+                        al.check_in_date,
+                        al.comments
+                      FROM asset_ledger al
+                      JOIN asset a ON al.asset_id = a.asset_id
+                      JOIN employee e ON al.emp_id = e.emp_id
+                      WHERE 1=1";
+            
+            $params = [];
+            $types = '';
+            
+            if (!empty($search)) {
+                $query .= " AND (al.asset_id LIKE ? OR al.emp_id LIKE ? OR a.name LIKE ? OR e.first_name LIKE ? OR e.last_name LIKE ?)";
+                $searchTerm = "%$search%";
+                $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm]);
+                $types .= 'sssss';
+            }
+            
+            if (!empty($statusFilter)) {
+                if ($statusFilter === 'assigned') {
+                    $query .= " AND al.check_in_date IS NULL";
+                } elseif ($statusFilter === 'available') {
+                    $query .= " AND al.check_in_date IS NOT NULL";
+                }
+            }
+            
+            $query .= " ORDER BY $sort $order LIMIT ? OFFSET ?";
+            $params = array_merge($params, [$limit, $offset]);
+            $types .= 'ii';
+            
+            $stmt = $conn->prepare($query);
+            if (!empty($params)) {
+                $stmt->bind_param($types, ...$params);
+            }
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            $ledgerEntries = [];
+            while ($row = $result->fetch_assoc()) {
+                $ledgerEntries[] = $row;
+            }
+            
+            $stmt->close();
+            return $ledgerEntries;
+            
+        } catch (Exception $e) {
+            error_log("AssetLedgerModel::getPaginatedLedgerListWithFilters Error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public static function exportLedgers(mysqli $conn, string $search = '', string $statusFilter = ''): array
+    {
+        try {
+            $query = "SELECT 
+                        al.ledger_id,
+                        al.asset_id,
+                        a.name as asset_name,
+                        al.emp_id,
+                        CONCAT(e.first_name, ' ', e.last_name) as employee_name,
+                        al.check_out_date,
+                        al.check_in_date,
+                        al.comments,
+                        CASE 
+                            WHEN al.check_in_date IS NULL THEN 'Assigned'
+                            ELSE 'Returned'
+                        END as status
+                      FROM asset_ledger al
+                      JOIN asset a ON al.asset_id = a.asset_id
+                      JOIN employee e ON al.emp_id = e.emp_id
+                      WHERE 1=1";
+            
+            $params = [];
+            $types = '';
+            
+            if (!empty($search)) {
+                $query .= " AND (al.asset_id LIKE ? OR al.emp_id LIKE ? OR a.name LIKE ? OR e.first_name LIKE ? OR e.last_name LIKE ?)";
+                $searchTerm = "%$search%";
+                $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm]);
+                $types .= 'sssss';
+            }
+            
+            if (!empty($statusFilter)) {
+                if ($statusFilter === 'assigned') {
+                    $query .= " AND al.check_in_date IS NULL";
+                } elseif ($statusFilter === 'available') {
+                    $query .= " AND al.check_in_date IS NOT NULL";
+                }
+            }
+            
+            $query .= " ORDER BY al.ledger_id DESC";
+            
+            $stmt = $conn->prepare($query);
+            if (!empty($params)) {
+                $stmt->bind_param($types, ...$params);
+            }
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            $ledgerEntries = [];
+            while ($row = $result->fetch_assoc()) {
+                $ledgerEntries[] = $row;
+            }
+            
+            $stmt->close();
+            return $ledgerEntries;
+            
+        } catch (Exception $e) {
+            error_log("AssetLedgerModel::exportLedgers Error: " . $e->getMessage());
+            return [];
+        }
+    }
+
 
 }
 

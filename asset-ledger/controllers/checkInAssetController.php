@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
 
     if (!$ledgerId) {
         $_SESSION['error'] = "Invalid ledger ID.";
-        header("Location: " . BASE_URL . "asset-ledger/ledger");
+        header("Location: " . BASE_URL . "asset-ledger/view");
         exit;
     }
 
@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
 
         if (!$ledgerEntry) {
             $_SESSION['error'] = "Ledger entry not found.";
-            header("Location: " . BASE_URL . "asset-ledger/ledger");
+            header("Location: " . BASE_URL . "asset-ledger/view");
             exit;
         }
 
@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
     } catch (Exception $e) {
         error_log("Check-In GET Error: " . $e->getMessage());
         $_SESSION['error'] = "Failed to load asset data.";
-        header("Location: " . BASE_URL . "asset-ledger/ledger");
+        header("Location: " . BASE_URL . "asset-ledger/view");
         exit;
     }
 }
@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if (!$ledgerId || !$checkInDate) {
         $_SESSION['error'] = "Missing required check-in data.";
-        header("Location: " . BASE_URL . "asset-ledger/ledger");
+        header("Location: " . BASE_URL . "asset-ledger/view");
         exit;
     }
 
@@ -56,12 +56,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION['error'] = "Failed to check in asset.";
         }
 
-        header("Location: " . BASE_URL . "asset-ledger/ledger");
+        header("Location: " . BASE_URL . "asset-ledger/view");
         exit;
     } catch (Exception $e) {
         error_log("Check-In POST Error: " . $e->getMessage());
         $_SESSION['error'] = "An unexpected error occurred during check-in.";
-        header("Location: " . BASE_URL . "asset-ledger/ledger");
+        header("Location: " . BASE_URL . "asset-ledger/view");
         exit;
     }
 }

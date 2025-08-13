@@ -35,7 +35,7 @@
                         <a href="<?= BASE_URL ?>asset-ledger/check-out">Check-Out Asset</a>
                     </li>
                     <li>
-                        <a href="<?= BASE_URL ?>asset-ledger/ledger">Asset History</a>
+                        <a href="<?= BASE_URL ?>asset-ledger/view">Asset History</a>
                     </li>
             </li>
         </ul>
