@@ -161,7 +161,9 @@
     display: inline-block;
 }
 
-.edit-button, .delete-button, .check-in-button {
+.edit-button,
+.delete-button,
+.check-in-button {
     padding: 8px;
     margin-right: 5px;
     border: none;
@@ -175,10 +177,13 @@
     height: 32px;
 }
 
-.edit-button img, .delete-button img, .check-in-button img {
+.edit-button img,
+.delete-button img,
+.check-in-button img {
     width: 16px;
     height: 16px;
-    filter: brightness(0) invert(1); /* Make icons white */
+    filter: brightness(0) invert(1);
+    /* Make icons white */
 }
 
 .edit-button {
@@ -188,7 +193,7 @@
 .edit-button:hover {
     background-color: #218838;
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .delete-button {
@@ -198,11 +203,12 @@
 .delete-button:hover {
     background-color: #c82333;
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .check-in-button {
-    background-color: #17a2b8; /* Info/cyan color for check-in action */
+    background-color: #17a2b8;
+    /* Info/cyan color for check-in action */
     color: white;
     padding: 6px 12px;
     border: none;
@@ -218,7 +224,7 @@
 .check-in-button:hover {
     background-color: #138496;
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Enhanced pagination */
@@ -346,7 +352,8 @@
     margin-top: 20px;
 }
 
-.cancel-button, .confirm-button {
+.cancel-button,
+.confirm-button {
     flex: 1;
     padding: 10px;
     border: none;
@@ -379,19 +386,19 @@
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .search-bar {
         min-width: unset;
     }
-    
+
     .export-actions {
         justify-content: center;
     }
-    
+
     .table-container {
         overflow-x: auto;
     }
-    
+
     .pagination {
         flex-direction: column;
         gap: 15px;

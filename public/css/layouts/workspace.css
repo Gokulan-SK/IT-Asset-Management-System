@@ -14,9 +14,9 @@
     transition: all 0.3s ease;
 }
 
-.content-header {
+/* .content-header {
     padding: 10px;
-}
+} */
 
 .content-tabs {
     display: flex;

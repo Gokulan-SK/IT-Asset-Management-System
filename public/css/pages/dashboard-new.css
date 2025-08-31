@@ -1,41 +1,5 @@
 /* Production Dashboard Styles */
 
-/* Icon Styling */
-.metric-icon i,
-.insight-icon i,
-.chart-header h4 i,
-.table-title h5 i,
-.alert-header h4 i,
-.analytics-header h4 i,
-.insights-header h4 i {
-    font-size: 1.2em;
-    margin-right: 8px;
-}
-
-.metric-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    font-size: 20px;
-    color: white;
-}
-
-.trend-indicator i {
-    font-size: 14px;
-}
-
-/* Button Icon Styling */
-.btn-secondary i,
-.table-export i {
-    margin-right: 6px;
-    font-size: 14px;
-}
-
 /* Dashboard Filters */
 .dashboard-filters {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

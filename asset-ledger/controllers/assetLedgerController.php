@@ -9,19 +9,19 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
     if (isset($_GET['export']) && $_GET['export'] === 'csv') {
         $search = $_GET['search'] ?? '';
         $statusFilter = $_GET['statusFilter'] ?? '';
-        
+
         $ledgers = AssetLedgerModel::exportLedgers($conn, $search, $statusFilter);
-        
+
         // Set CSV headers
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="asset_ledger_' . date('Y-m-d_H-i-s') . '.csv"');
-        
+
         $output = fopen('php://output', 'w');
-        
+
         // CSV headers
         fputcsv($output, [
             'Ledger ID',
-            'Asset ID', 
+            'Asset ID',
             'Asset Name',
             'Employee ID',
             'Employee Name',
@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
             'Status',
             'Comments'
         ]);
-        
+
         // CSV data
         foreach ($ledgers as $ledger) {
             fputcsv($output, [
@@ -45,11 +45,11 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
                 $ledger['comments'] ?? ''
             ]);
         }
-        
+
         fclose($output);
         exit;
     }
-    
+
     // Get parameters
     $page = isset($_GET["page"]) ? (int) $_GET["page"] : 1;
     $limit = isset($_GET["limit"]) ? (int) $_GET["limit"] : 10;
@@ -57,12 +57,12 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
     $statusFilter = $_GET['statusFilter'] ?? '';
     $sort = $_GET['sort'] ?? 'ledger_id';
     $order = $_GET['order'] ?? 'DESC';
-    
+
     // Validate limit
     if (!in_array($limit, [10, 25, 50])) {
         $limit = 10;
     }
-    
+
     $offset = ($page - 1) * $limit;
 
     $paginationError = null;

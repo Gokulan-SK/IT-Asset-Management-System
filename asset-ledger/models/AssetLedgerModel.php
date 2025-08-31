@@ -161,17 +161,17 @@ class AssetLedgerModel
                      JOIN asset a ON al.asset_id = a.asset_id
                      JOIN employee e ON al.emp_id = e.emp_id
                      WHERE 1=1";
-            
+
             $params = [];
             $types = '';
-            
+
             if (!empty($search)) {
                 $query .= " AND (al.asset_id LIKE ? OR al.emp_id LIKE ? OR a.name LIKE ? OR e.first_name LIKE ? OR e.last_name LIKE ?)";
                 $searchTerm = "%$search%";
                 $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm]);
                 $types .= 'sssss';
             }
-            
+
             if (!empty($statusFilter)) {
                 if ($statusFilter === 'assigned') {
                     $query .= " AND al.check_in_date IS NULL";
@@ -179,14 +179,14 @@ class AssetLedgerModel
                     $query .= " AND al.check_in_date IS NOT NULL";
                 }
             }
-            
+
             $stmt = $conn->prepare($query);
             if (!empty($params)) {
                 $stmt->bind_param($types, ...$params);
             }
             $stmt->execute();
             $result = $stmt->get_result();
-            
+
             if ($result && $row = $result->fetch_assoc()) {
                 return (int) $row["total"];
             }
@@ -205,10 +205,10 @@ class AssetLedgerModel
             if (!in_array($sort, $allowedSortColumns)) {
                 $sort = 'ledger_id';
             }
-            
+
             // Validate order
             $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC';
-            
+
             $query = "SELECT 
                         al.ledger_id,
                         al.asset_id,
@@ -223,17 +223,17 @@ class AssetLedgerModel
                       JOIN asset a ON al.asset_id = a.asset_id
                       JOIN employee e ON al.emp_id = e.emp_id
                       WHERE 1=1";
-            
+
             $params = [];
             $types = '';
-            
+
             if (!empty($search)) {
                 $query .= " AND (al.asset_id LIKE ? OR al.emp_id LIKE ? OR a.name LIKE ? OR e.first_name LIKE ? OR e.last_name LIKE ?)";
                 $searchTerm = "%$search%";
                 $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm]);
                 $types .= 'sssss';
             }
-            
+
             if (!empty($statusFilter)) {
                 if ($statusFilter === 'assigned') {
                     $query .= " AND al.check_in_date IS NULL";
@@ -241,26 +241,26 @@ class AssetLedgerModel
                     $query .= " AND al.check_in_date IS NOT NULL";
                 }
             }
-            
+
             $query .= " ORDER BY $sort $order LIMIT ? OFFSET ?";
             $params = array_merge($params, [$limit, $offset]);
             $types .= 'ii';
-            
+
             $stmt = $conn->prepare($query);
             if (!empty($params)) {
                 $stmt->bind_param($types, ...$params);
             }
             $stmt->execute();
             $result = $stmt->get_result();
-            
+
             $ledgerEntries = [];
             while ($row = $result->fetch_assoc()) {
                 $ledgerEntries[] = $row;
             }
-            
+
             $stmt->close();
             return $ledgerEntries;
-            
+
         } catch (Exception $e) {
             error_log("AssetLedgerModel::getPaginatedLedgerListWithFilters Error: " . $e->getMessage());
             return [];
@@ -287,17 +287,17 @@ class AssetLedgerModel
                       JOIN asset a ON al.asset_id = a.asset_id
                       JOIN employee e ON al.emp_id = e.emp_id
                       WHERE 1=1";
-            
+
             $params = [];
             $types = '';
-            
+
             if (!empty($search)) {
                 $query .= " AND (al.asset_id LIKE ? OR al.emp_id LIKE ? OR a.name LIKE ? OR e.first_name LIKE ? OR e.last_name LIKE ?)";
                 $searchTerm = "%$search%";
                 $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm]);
                 $types .= 'sssss';
             }
-            
+
             if (!empty($statusFilter)) {
                 if ($statusFilter === 'assigned') {
                     $query .= " AND al.check_in_date IS NULL";
@@ -305,24 +305,24 @@ class AssetLedgerModel
                     $query .= " AND al.check_in_date IS NOT NULL";
                 }
             }
-            
+
             $query .= " ORDER BY al.ledger_id DESC";
-            
+
             $stmt = $conn->prepare($query);
             if (!empty($params)) {
                 $stmt->bind_param($types, ...$params);
             }
             $stmt->execute();
             $result = $stmt->get_result();
-            
+
             $ledgerEntries = [];
             while ($row = $result->fetch_assoc()) {
                 $ledgerEntries[] = $row;
             }
-            
+
             $stmt->close();
             return $ledgerEntries;
-            
+
         } catch (Exception $e) {
             error_log("AssetLedgerModel::exportLedgers Error: " . $e->getMessage());
             return [];

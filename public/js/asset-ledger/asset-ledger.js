@@ -190,7 +190,9 @@ class AssetLedgerManager {
     }
     exportParams.set("export", "csv");
 
-    const exportURL = `${this.baseUrl}asset-ledger/view?${exportParams.toString()}`;
+    const exportURL = `${
+      this.baseUrl
+    }asset-ledger/view?${exportParams.toString()}`;
     console.log("Exporting to:", exportURL);
     window.location.href = exportURL;
   }

@@ -1,14 +1,16 @@
 /* Select2 styling to match standard form elements */
 .select2-selection--single {
     width: 100% !important;
-    height: 48px !important; /* Match standard input height */
+    height: 48px !important;
+    /* Match standard input height */
     padding: 12px !important;
     border: 1px solid #D0D5DD !important;
     border-radius: 8px !important;
     font-size: 14px !important;
     background-color: #FFFFFF !important;
     box-sizing: border-box !important;
-    line-height: 24px !important; /* Center the text vertically */
+    line-height: 24px !important;
+    /* Center the text vertically */
 }
 
 /* Remove default Select2 styling */
@@ -21,7 +23,8 @@
 
 /* Style the dropdown arrow */
 .select2-selection--single .select2-selection__arrow {
-    height: 46px !important; /* Match the selection height */
+    height: 46px !important;
+    /* Match the selection height */
     right: 12px !important;
 }
 
