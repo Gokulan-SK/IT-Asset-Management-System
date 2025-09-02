@@ -32,15 +32,19 @@ $limit = $limit ?? 10;
             <select id="status-filter">
               <option value="">All Statuses</option>
               <option value="available" <?= $statusFilter === 'available' ? 'selected' : '' ?>>Available</option>
-              <option value="assigned" <?= $statusFilter === 'assigned' ? 'selected' : '' ?>>Assigned</option>
-              <option value="under-maintenance" <?= $statusFilter === 'under-maintenance' ? 'selected' : '' ?>>Under
-                Maintenance</option>
+              <option value="in_use" <?= $statusFilter === 'in_use' ? 'selected' : '' ?>>In Use</option>
+              <option value="under_maintenance" <?= $statusFilter === 'under_maintenance' ? 'selected' : '' ?>>Under Maintenance</option>
+              <option value="retired" <?= $statusFilter === 'retired' ? 'selected' : '' ?>>Retired</option>
               <option value="disposed" <?= $statusFilter === 'disposed' ? 'selected' : '' ?>>Disposed</option>
-              <option value="new" <?= $statusFilter === 'new' ? 'selected' : '' ?>>New</option>
-              <option value="good" <?= $statusFilter === 'good' ? 'selected' : '' ?>>Good</option>
-              <option value="repair-needed" <?= $statusFilter === 'repair-needed' ? 'selected' : '' ?>>Repair Needed
-              </option>
-              <option value="damaged" <?= $statusFilter === 'damaged' ? 'selected' : '' ?>>Damaged</option>
+              <option value="active" <?= $statusFilter === 'active' ? 'selected' : '' ?>>Active</option>
+              <option value="expired" <?= $statusFilter === 'expired' ? 'selected' : '' ?>>Expired</option>
+            </select>
+            <select id="category-filter">
+              <option value="">All Categories</option>
+              <option value="hardware" <?= $categoryFilter === 'hardware' ? 'selected' : '' ?>>Hardware</option>
+              <option value="software" <?= $categoryFilter === 'software' ? 'selected' : '' ?>>Software</option>
+              <option value="office_equipment" <?= $categoryFilter === 'office_equipment' ? 'selected' : '' ?>>Office Equipment</option>
+              <option value="other" <?= $categoryFilter === 'other' ? 'selected' : '' ?>>Other</option>
             </select>
           </div>
           <div class="export-actions">
@@ -161,28 +165,88 @@ $limit = $limit ?? 10;
           <p><?= htmlspecialchars($paginationError); ?></p>
         </div>
       <?php endif; ?>
+      
       <div class="pagination">
-        <span>
-          <?php
-          $limit = 10;
-          $offset = ($currentPage - 1) * $limit;
-
-          if ($totalRecordsCount === 0) {
-            echo "0-0 of 0";
-          } else {
-            $from = $offset + 1;
-            $to = min($offset + $limit, $totalRecordsCount);
-            echo "$from-$to of $totalRecordsCount";
-          }
-          ?>
-        </span>
-        <div class="pagination-buttons">
-          <button class="<?= $currentPage <= 1 ? 'btn disabled' : 'btn-primary' ?>" <?php echo ($currentPage <= 1 ? 'disabled' : '') ?> onclick="window.AssetListManager.changePage(<?= $currentPage - 1 ?>)">
+        <div class="pagination-info">
+          <span class="records-info">
+            <?php
+            if ($totalRecordsCount === 0) {
+              echo "0-0 of 0";
+            } else {
+              $from = (($currentPage - 1) * $limit) + 1;
+              $to = min($currentPage * $limit, $totalRecordsCount);
+              echo "$from-$to of $totalRecordsCount";
+            }
+            ?>
+          </span>
+          <div class="page-size-selector">
+            <label for="page-size">Show:</label>
+            <select id="page-size" name="limit">
+              <option value="10" <?= $limit == 10 ? 'selected' : '' ?>>10</option>
+              <option value="25" <?= $limit == 25 ? 'selected' : '' ?>>25</option>
+              <option value="50" <?= $limit == 50 ? 'selected' : '' ?>>50</option>
+              <option value="100" <?= $limit == 100 ? 'selected' : '' ?>>100</option>
+            </select>
+            <span>per page</span>
+          </div>
+        </div> 
+        
+        <div class="pagination-controls">
+          <div class="page-info">
+            Page <?= $currentPage ?> of <?= $totalPages ?>
+          </div>
+          <div class="pagination-buttons">
+            <button 
+            class="<?= $currentPage <= 1 ? 'btn disabled' : 'btn-primary' ?>" 
+            <?= $currentPage <= 1 ? 'disabled' : '' ?> 
+            onclick="window.AssetListManager && window.AssetListManager.changePage(<?= $currentPage - 1 ?>)"
+            title="Previous page">
             ← Previous
           </button>
-          <button class="<?= $currentPage >= $totalPages ? 'btn disabled' : 'btn-primary ' ?>" <?= $currentPage >= $totalPages ? 'disabled' : '' ?> onclick="window.AssetListManager.changePage(<?= $currentPage + 1 ?>)">
-            Next →
-          </button>
+            
+            <div class="page-numbers">
+              <?php
+              // Calculate page range to show
+              $start = max(1, $currentPage - 2);
+              $end = min($totalPages, $currentPage + 2);
+              
+              // Show first page if not in range
+              if ($start > 1): ?>
+                <button 
+                  class="btn-page <?= $currentPage == 1 ? 'active' : '' ?>" 
+                  onclick="window.AssetListManager && window.AssetListManager.changePage(1)">1</button>
+                <?php if ($start > 2): ?>
+                  <span class="pagination-ellipsis">...</span>
+                <?php endif;
+              endif;
+              
+              // Show page numbers in range
+              for ($i = $start; $i <= $end; $i++): ?>
+                <button 
+                  class="btn-page <?= $currentPage == $i ? 'active' : '' ?>" 
+                  onclick="window.AssetListManager && window.AssetListManager.changePage(<?= $i ?>)"><?= $i ?></button>
+              <?php endfor;
+              
+              // Show last page if not in range
+              if ($end < $totalPages): 
+                if ($end < $totalPages - 1): ?>
+                  <span class="pagination-ellipsis">...</span>
+                <?php endif; ?>
+                <button 
+                  class="btn-page <?= $currentPage == $totalPages ? 'active' : '' ?>" 
+                  onclick="window.AssetListManager && window.AssetListManager.changePage(<?= $totalPages ?>)"><?= $totalPages ?></button>
+              <?php endif; ?>
+            </div>
+            
+            <button 
+              class="<?= $currentPage >= $totalPages ? 'btn disabled' : 'btn-primary' ?>" 
+              <?= $currentPage >= $totalPages ? 'disabled' : '' ?> 
+              onclick="window.AssetListManager && window.AssetListManager.changePage(<?= $currentPage + 1 ?>)"
+              title="Next page">
+              Next →
+            </button>
+          </div>
+          
         </div>
       </div>
     </div>

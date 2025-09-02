@@ -1,72 +1,27 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Employee Dropdown
+  // Initialize the Employee Dropdown with client-side searching
   $("#employee-id").select2({
     placeholder: "Search for an employee...",
     width: "100%",
-    minimumInputLength: 1,
-    ajax: {
-      url: "/asset_management/api/employee/search",
-      dataType: "json",
-      delay: 250,
-      data: function (params) {
-        return {
-          term: params.term,
-        };
-      },
-      processResults: function (data) {
-        return {
-          results: data.results.map((emp) => ({
-            id: emp.id,
-            text: emp.text,
-            name: emp.name || "",
-          })),
-        };
-      },
-      cache: true,
-    },
     dropdownParent: $("#employee-id").parent(),
   });
 
-  $("#employee-id").on("select2:open", function () {
-    document.querySelector(".select2-search__field").focus();
-  });
-
+  // Automatically fill the employee name when an employee is selected
   $("#employee-id").on("select2:select", function (e) {
-    const selectedData = e.params.data;
-    document.getElementById("employee-name").value = selectedData.name || "";
+    // Get the full text of the selected option
+    const selectedName = $(this).find("option:selected").text().trim();
+    document.getElementById("employee-name").value = selectedName || "";
   });
 
-  // Asset Dropdown
+  // Initialize the Asset Dropdown with client-side searching
   $("#asset").select2({
     placeholder: "Search for an asset...",
     width: "100%",
-    minimumInputLength: 1,
-    ajax: {
-      url: "/asset_management/api/asset/search",
-      dataType: "json",
-      delay: 250,
-      data: function (params) {
-        return {
-          term: params.term,
-        };
-      },
-      processResults: function (data) {
-        return {
-          results: data.results.map((asset) => ({
-            id: asset.id,
-            text: asset.text,
-          })),
-        };
-      },
-      cache: true,
-    },
     dropdownParent: $("#asset").parent(),
   });
 
-  $("#asset").on("select2:open", function () {
-    document.querySelector(".select2-search__field").focus();
-  });
-  $("#asset").on("select2:open", function () {
+  // When a dropdown is opened, automatically focus the search field inside it
+  $(document).on("select2:open", () => {
     document.querySelector(".select2-search__field").focus();
   });
 });

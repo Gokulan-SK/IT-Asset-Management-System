@@ -124,7 +124,7 @@
         <label for="license-key" class=" required">License Key</label>
         <input type="text" name="license-key" id="license-key" placeholder="License Key"
           pattern="/^[A-Za-z0-9\_\.+=\[\]\{\}\(\):;,<>\?~\`!\@\#\$\%\^\&\*\|\- ]{12,64}$/"
-          value="<?= $formData['licenseKey'] ?? '' ?>" autocomplete=""
+          value="<?= $formData['licenseKey'] ?? null ?>" autocomplete=""
           class="<?= isset($errors['licenseKeyError']) ? 'field-error' : ''; ?>" />
         <?php if (!empty($errors['licenseKeyError'])): ?>
           <p class="error-text"><?php echo htmlspecialchars($errors['licenseKeyError']); ?></p>

@@ -14,4 +14,7 @@
         </div>
     </div>
 </div>
+<script>
+    const BASE_URL = "<?= BASE_URL ?>";
+</script>
 <?php include BASE_PATH . "views/layouts/components/footer.php"; ?>

@@ -3,6 +3,7 @@
 require_once BASE_PATH . "utils/validators/AssetLedgerValidator.php";
 require_once BASE_PATH . "asset-ledger/models/AssetLedgerModel.php";
 require_once BASE_PATH . "asset/models/AssetModel.php";
+require_once BASE_PATH . "employee/models/EmployeeModel.php";
 
 $pageTitle = "Check-Out Asset";
 $viewToInclude = BASE_PATH . "asset-ledger/views/check_out_form.php";
@@ -29,6 +30,17 @@ if (isset($_SESSION['successMessage'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+    try {
+        $availableAssets = AssetModel::getAvailableAssets($conn);
+        $allEmployees = EmployeeModel::getAllEmployees($conn);
+
+    } catch (Exception $e) {
+        $availableAssets = [];
+        $allEmployees = [];
+        error_log("CheckOutAssetController GET Error: " . $e->getMessage());
+    }
+
+    // The rest of your GET block and the entire POST block remain the same...
     require_once BASE_PATH . "views/layouts/layout.php";
 } else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $assetId = (int) $_POST['asset'];
@@ -43,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     $category = AssetModel::getCategoryById($conn, $assetId);
 
-    $result2 = AssetModel::updateAssetStatus($conn, $assetId, $category === "software" ? "active" : "in_use");
+    $result2 = AssetModel::updateAssetStatus($conn, $assetId, "in_use");
 
     if ($result1 && $result2) {
         $_SESSION['successMessage'] = "Asset checked out successfully.";

@@ -1,6 +1,7 @@
 {
     "software": [
         "active",
+        "in_use",
         "expired",
         "revoked",
         "inactive"

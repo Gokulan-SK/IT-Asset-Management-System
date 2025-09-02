@@ -1,4 +1,5 @@
 <?php
+require_once BASE_PATH . "asset/models/AssetModel.php";
 
 class AssetLedgerModel
 {
@@ -138,12 +139,17 @@ class AssetLedgerModel
             $stmt->close();
 
             // 2. Set asset status back to 'in_storage'
-            $query2 = "UPDATE asset SET asset_status = 'in_storage' 
-                   WHERE asset_id = (SELECT asset_id FROM asset_ledger WHERE ledger_id = ?)";
-            $stmt2 = $conn->prepare($query2);
-            $stmt2->bind_param("i", $ledgerId);
-            $stmt2->execute();
-            $stmt2->close();
+            $query = "select al.asset_id,a.category from asset_ledger al join asset a on al.asset_id = a.asset_id where ledger_id=?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("i", $ledgerId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $stmt->close();
+            $assetId = $row['asset_id'];
+            $category = $row['category'];
+            $result = AssetModel::updateAssetStatus($conn, $assetId, $category === 'software' ? 'active' : 'in_storage');
+            echo "<script>console.log(" . json_encode($result) . ")</script>";
 
             return true;
         } catch (Exception $e) {

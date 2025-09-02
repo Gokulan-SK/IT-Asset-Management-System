@@ -68,6 +68,11 @@
     color: #333;
 }
 
+.filter-bar {
+    display: flex;
+    gap: 5px;
+}
+
 .filter-bar select {
     padding: 10px 15px;
     border: 1px solid #ddd;
@@ -234,11 +239,24 @@
     align-items: center;
     margin-top: 20px;
     padding: 0 15px;
+    gap: 10px;
 }
 
 .pagination span {
     font-size: 14px;
     color: #666;
+}
+
+.pagination-info {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .pagination-buttons {

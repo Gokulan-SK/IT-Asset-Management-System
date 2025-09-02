@@ -68,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         "subcategory" => trim($_POST['subcategory'] ?? null),
         "purchase-date" => $_POST['purchase-date'] ?? null,
         "serial-number" => trim($_POST['serial-number'] ?? null) ?: null,
-        "license-key" => trim($_POST['license-key'] ?? null),
+        "license-key" => !empty(trim($_POST['license-key'])) ? trim($_POST['license-key']) : null,
         "license-expiry" => $_POST['license-expiry'] ?? null,
         "warranty-period" => is_numeric($_POST['warranty-period']) ? (int) $_POST['warranty-period'] : null,
         "unit-price" => is_numeric($_POST['unit-price']) ? (int) $_POST['unit-price'] : null,

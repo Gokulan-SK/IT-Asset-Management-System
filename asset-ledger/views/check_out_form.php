@@ -6,6 +6,8 @@
     $errors = $errors ?? null;
     $successMessage = $successMessage ?? null;
     $errorMessage = $errorMessage ?? null;
+    $allEmployees = $allEmployees ?? [];
+    $availableAssets = $availableAssets ?? [];
 
     ?>
 
@@ -22,24 +24,35 @@
       </div>
     <?php endif; ?>
     <form action="check-out" method="POST" class="form">
+      <!-- Employee Dropdown -->
       <div class="label-input">
         <label for="employee-id">Select Employee ID</label>
         <select name="employee-id" id="employee-id" class="select2-selection" style="width: 100%;" required>
-          <option value="" disabled selected>
-            Select an Employee ID
-          </option>
+          <option value="" disabled selected>Select an Employee ID</option>
+
+          <!-- PRE-POPULATE WITH INITIAL LIST -->
+          <?php foreach ($allEmployees as $employee): ?>
+            <option value="<?= htmlspecialchars($employee['emp_id']) ?>">
+              <?= htmlspecialchars($employee['full_name']) . " - " . $employee['emp_id'] ?>
+            </option>
+          <?php endforeach; ?>
+
         </select>
       </div>
-      <div class="label-input">
-        <label for="employee-name">Employee Name</label>
-        <input type="text" name="employee-name" id="employee-name" placeholder="Employee Name" disabled />
-      </div>
+
+      <!-- Asset Dropdown -->
       <div class="label-input">
         <label for="asset">Select Asset</label>
         <select name="asset" id="asset" style="width: 100%;" required>
-          <option value="" disabled selected>
-            Select an Asset
-          </option>
+          <option value="" disabled selected>Select an Asset</option>
+
+          <!-- PRE-POPULATE WITH INITIAL LIST -->
+          <?php foreach ($availableAssets as $asset): ?>
+            <option value="<?= htmlspecialchars($asset['asset_id']) ?>">
+              <?= htmlspecialchars($asset['asset_name']) ?>
+            </option>
+          <?php endforeach; ?>
+
         </select>
       </div>
       <div class="label-input">

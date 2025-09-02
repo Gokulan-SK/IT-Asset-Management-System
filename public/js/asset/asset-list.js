@@ -1,17 +1,16 @@
 class AssetListManager {
   constructor() {
     this.searchTimer = null;
-    this.searchDelay = 500; // 500ms delay for search
+    this.searchDelay = 500;
     this.currentFilters = this.getFiltersFromURL();
-    this.currentAssetId = null;
-    this.baseUrl = BASE_URL || "";
+    this.baseUrl = typeof BASE_URL !== "undefined" ? BASE_URL : "/";
+
     this.init();
   }
 
   init() {
     this.bindEvents();
     this.updateUIFromFilters();
-    this.updateDeleteModalActions();
   }
 
   getFiltersFromURL() {
@@ -27,344 +26,170 @@ class AssetListManager {
     };
   }
 
-  buildURL(filters = {}) {
-    const params = { ...this.currentFilters, ...filters };
-
-    // Remove empty parameters
-    Object.keys(params).forEach((key) => {
-      if (params[key] === "" || params[key] === "all") {
-        delete params[key];
+  // SIMPLIFIED AND FIXED: This now correctly builds the URL from the class's current state.
+  buildURL() {
+    const params = new URLSearchParams();
+    for (const key in this.currentFilters) {
+      const value = this.currentFilters[key];
+      // Add param if it's not empty or a default value
+      if (value && value !== "all") {
+        if (
+          (key === "page" && value > 1) ||
+          (key === "limit" && value !== 10) ||
+          (key === "sort" && value !== "asset_id") ||
+          (key === "order" && value !== "ASC") ||
+          !["page", "limit", "sort", "order"].includes(key)
+        ) {
+          params.set(key, value);
+        }
       }
-    });
-
-    // Always reset to page 1 when filters change (except when specifically changing page)
-    if (!filters.hasOwnProperty("page")) {
-      params.page = 1;
     }
-
-    const url = new URL(window.location.href);
-    url.search = new URLSearchParams(params).toString();
-    return url.toString();
+    return `${this.baseUrl}asset/view?${params.toString()}`;
   }
 
-  updateFilters(newFilters) {
+  // FIXED: This is the central function to update state and navigate
+  updateStateAndNavigate(newFilters) {
+    // Merge new filters with current ones
     this.currentFilters = { ...this.currentFilters, ...newFilters };
-    const newURL = this.buildURL();
-    window.location.href = newURL;
+
+    // Always reset to page 1 if any filter/sort/limit changes, EXCEPT for pagination itself
+    if (!newFilters.hasOwnProperty("page")) {
+      this.currentFilters.page = 1;
+    }
+
+    window.location.href = this.buildURL();
   }
 
   bindEvents() {
-    console.log("Binding events for AssetListManager...");
+    // Search functionality
+    document.getElementById("table-search")?.addEventListener("input", (e) => {
+      clearTimeout(this.searchTimer);
+      this.searchTimer = setTimeout(() => {
+        this.updateStateAndNavigate({ search: e.target.value });
+      }, this.searchDelay);
+    });
 
-    // Search functionality with debouncing
-    const searchInput = document.getElementById("table-search");
-    if (searchInput) {
-      console.log("Search input found");
-      searchInput.addEventListener("input", (e) => {
-        clearTimeout(this.searchTimer);
-        this.searchTimer = setTimeout(() => {
-          console.log("Search triggered:", e.target.value);
-          this.handleSearch(e.target.value);
-        }, this.searchDelay);
-      });
-    } else {
-      console.error("Search input not found!");
-    }
-
-    // Clear search button
-    const clearSearchBtn = document.getElementById("clear-search");
-    if (clearSearchBtn) {
-      console.log("Clear search button found");
-      clearSearchBtn.addEventListener("click", () => {
-        console.log("Clear search clicked");
-        searchInput.value = "";
-        this.handleSearch("");
-      });
-    } else {
-      console.error("Clear search button not found!");
-    }
-
-    // Status filter functionality
-    const statusFilterSelect = document.getElementById("status-filter");
-    if (statusFilterSelect) {
-      console.log("Status filter select found");
-      statusFilterSelect.addEventListener("change", (e) => {
-        console.log("Status filter changed:", e.target.value);
-        this.handleStatusFilter(e.target.value);
-      });
-    } else {
-      console.error("Status filter select not found!");
-    }
-
-    // Category filter functionality
-    const categoryFilterSelect = document.getElementById("category-filter");
-    if (categoryFilterSelect) {
-      console.log("Category filter select found");
-      categoryFilterSelect.addEventListener("change", (e) => {
-        console.log("Category filter changed:", e.target.value);
-        this.handleCategoryFilter(e.target.value);
-      });
-    }
+    // Other filters
+    document.getElementById("clear-search")?.addEventListener("click", () => {
+      document.getElementById("table-search").value = "";
+      this.updateStateAndNavigate({ search: "" });
+    });
+    document
+      .getElementById("status-filter")
+      ?.addEventListener("change", (e) =>
+        this.updateStateAndNavigate({ statusFilter: e.target.value })
+      );
+    document
+      .getElementById("category-filter")
+      ?.addEventListener("change", (e) =>
+        this.updateStateAndNavigate({ categoryFilter: e.target.value })
+      );
+    document
+      .getElementById("reset-filters")
+      ?.addEventListener("click", () => this.resetAllFilters());
+    document
+      .getElementById("reset-filters-inline")
+      ?.addEventListener("click", () => this.resetAllFilters());
+    document
+      .getElementById("export-csv")
+      ?.addEventListener("click", () => this.handleExport());
+    document
+      .getElementById("page-size")
+      ?.addEventListener("change", (e) =>
+        this.updateStateAndNavigate({ limit: parseInt(e.target.value) })
+      );
 
     // Sort functionality
-    const sortableHeaders = document.querySelectorAll(".sortable");
-    console.log("Found sortable headers:", sortableHeaders.length);
-    sortableHeaders.forEach((header) => {
+    document.querySelectorAll(".sortable").forEach((header) => {
       header.addEventListener("click", () => {
         const sortField = header.getAttribute("data-sort");
-        console.log("Sort clicked:", sortField);
-        this.handleSort(sortField);
+        const newOrder =
+          this.currentFilters.sort === sortField &&
+          this.currentFilters.order === "ASC"
+            ? "DESC"
+            : "ASC";
+        this.updateStateAndNavigate({ sort: sortField, order: newOrder });
       });
     });
 
-    // Export functionality
-    const exportBtn = document.getElementById("export-csv");
-    if (exportBtn) {
-      console.log("Export button found");
-      exportBtn.addEventListener("click", () => {
-        console.log("Export button clicked");
-        this.handleExport();
-      });
-    } else {
-      console.error("Export button not found!");
-    }
-
-    // Reset filters functionality
-    const resetBtn = document.getElementById("reset-filters");
-    if (resetBtn) {
-      console.log("Reset button found");
-      resetBtn.addEventListener("click", () => {
-        console.log("Reset button clicked");
-        this.resetAllFilters();
-      });
-    } else {
-      console.error("Reset button not found!");
-    }
-
-    // Page size functionality
-    const pageSizeSelect = document.getElementById("page-size");
-    if (pageSizeSelect) {
-      console.log("Page size select found");
-      pageSizeSelect.addEventListener("change", (e) => {
-        console.log("Page size changed:", e.target.value);
-        this.updatePageSize(parseInt(e.target.value));
-      });
-    } else {
-      console.error("Page size select not found!");
-    }
-  }
-
-  handleSearch(searchTerm) {
-    this.updateFilters({ search: searchTerm, page: 1 });
-  }
-
-  handleStatusFilter(statusValue) {
-    this.updateFilters({ statusFilter: statusValue, page: 1 });
-  }
-
-  handleCategoryFilter(categoryValue) {
-    this.updateFilters({ categoryFilter: categoryValue, page: 1 });
-  }
-
-  handleSort(sortField) {
-    if (this.currentFilters.sort === sortField) {
-      // Toggle order if same field
-      const newOrder = this.currentFilters.order === "ASC" ? "DESC" : "ASC";
-      this.updateFilters({ order: newOrder });
-    } else {
-      // New field, default to ASC
-      this.updateFilters({ sort: sortField, order: "ASC" });
-    }
+    // --- Modal and Delete Button Binding (Done once on init) ---
+    this.bindDeleteButtons();
+    this.bindModalCloseEvents();
   }
 
   resetAllFilters() {
-    console.log("Resetting all filters");
-    // Keep only the base URL
     window.location.href = this.baseUrl + "asset/view";
   }
 
   handleExport() {
-    // Create export URL with current filters but no pagination
-    const exportParams = new URLSearchParams();
-    if (this.currentFilters.search) {
-      exportParams.set("search", this.currentFilters.search);
-    }
-    if (this.currentFilters.statusFilter) {
-      exportParams.set("statusFilter", this.currentFilters.statusFilter);
-    }
-    if (this.currentFilters.categoryFilter) {
-      exportParams.set("categoryFilter", this.currentFilters.categoryFilter);
-    }
-    exportParams.set("export", "csv");
-
-    const exportUrl = `${this.baseUrl}asset/view?${exportParams.toString()}`;
-    console.log("Export URL:", exportUrl);
-
-    // Show loading state
-    const exportBtn = document.getElementById("export-csv");
-    const originalText = exportBtn.textContent;
-    exportBtn.textContent = "Exporting...";
-    exportBtn.disabled = true;
-
-    // Create a temporary link to trigger download
-    const link = document.createElement("a");
-    link.href = exportUrl;
-    link.download = `assets_${new Date().toISOString().split("T")[0]}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    // Reset button state
-    setTimeout(() => {
-      exportBtn.textContent = originalText;
-      exportBtn.disabled = false;
-    }, 2000);
+    const exportUrl =
+      this.buildURL() +
+      (this.buildURL().includes("?") ? "&" : "?") +
+      "export=csv";
+    window.location.href = exportUrl;
   }
 
   updateUIFromFilters() {
-    // Update search input
-    const searchInput = document.getElementById("table-search");
-    if (searchInput && this.currentFilters.search) {
-      searchInput.value = this.currentFilters.search;
-    }
-
-    // Update status filter
-    const statusFilter = document.getElementById("status-filter");
-    if (statusFilter && this.currentFilters.statusFilter) {
-      statusFilter.value = this.currentFilters.statusFilter;
-    }
-
-    // Update category filter
-    const categoryFilter = document.getElementById("category-filter");
-    if (categoryFilter && this.currentFilters.categoryFilter) {
-      categoryFilter.value = this.currentFilters.categoryFilter;
-    }
-
-    // Update page size selector
-    const pageSizeSelect = document.getElementById("page-size");
-    if (pageSizeSelect && this.currentFilters.limit) {
-      pageSizeSelect.value = this.currentFilters.limit.toString();
-    }
+    document.getElementById("table-search").value = this.currentFilters.search;
+    document.getElementById("status-filter").value =
+      this.currentFilters.statusFilter;
+    document.getElementById("category-filter").value =
+      this.currentFilters.categoryFilter;
+    document.getElementById("page-size").value =
+      this.currentFilters.limit.toString();
   }
 
+  // --- Modal Logic (Cleaned up) ---
   bindDeleteButtons() {
-    const deleteButtons = document.querySelectorAll(".delete-button");
-    console.log("Found delete buttons:", deleteButtons.length);
-
-    deleteButtons.forEach((button) => {
+    document.querySelectorAll(".delete-button").forEach((button) => {
       button.addEventListener("click", (e) => {
         e.preventDefault();
         const assetId = button.getAttribute("data-id");
-        console.log("Delete button clicked for asset:", assetId);
         this.showDeleteModal(assetId);
       });
     });
+  }
 
-    // Reset filters inline button
-    const resetInlineBtn = document.getElementById("reset-filters-inline");
-    if (resetInlineBtn) {
-      resetInlineBtn.addEventListener("click", () => {
-        this.resetAllFilters();
-      });
-    }
+  bindModalCloseEvents() {
+    const modal = document.getElementById("delete-modal");
+    if (!modal) return;
+    const closeBtn = modal.querySelector(".modal-closebtn");
+    const cancelBtn = modal.querySelector(".cancel-button");
+    const closeModal = () => (modal.style.display = "none");
+
+    closeBtn?.addEventListener("click", closeModal);
+    cancelBtn?.addEventListener("click", closeModal);
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
   }
 
   showDeleteModal(assetId) {
-    this.currentAssetId = assetId;
     const modal = document.getElementById("delete-modal");
     const form = document.getElementById("delete-form");
     const idInput = document.getElementById("delete-item-id");
-
     if (modal && form && idInput) {
       idInput.value = assetId;
       form.action = `${this.baseUrl}asset/delete`;
-      modal.style.display = "block";
-      console.log("Delete modal shown for asset:", assetId);
-    } else {
-      console.error("Delete modal elements not found:", { modal, form, idInput });
-    }
-
-    // Close modal when clicking outside
-    window.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        this.closeDeleteModal();
-      }
-    });
-
-    // Close modal with close button
-    const closeBtn = modal.querySelector(".modal-closebtn");
-    const cancelBtn = modal.querySelector(".cancel-button");
-    
-    [closeBtn, cancelBtn].forEach(btn => {
-      if (btn) {
-        btn.addEventListener("click", () => {
-          this.closeDeleteModal();
-        });
-      }
-    });
-  }
-
-  closeDeleteModal() {
-    const modal = document.getElementById("delete-modal");
-    if (modal) {
-      modal.style.display = "none";
-      this.currentAssetId = null;
-      console.log("Delete modal closed");
+      modal.style.display = "flex"; // Use flex for centering
     }
   }
 
-  updateDeleteModalActions() {
-    const modal = document.getElementById("delete-modal");
-    if (!modal) return;
-
-    // Close modal functionality
-    const closeBtn = modal.querySelector(".modal-closebtn");
-    const cancelBtn = modal.querySelector(".cancel-button");
-    
-    [closeBtn, cancelBtn].forEach(btn => {
-      if (btn) {
-        btn.addEventListener("click", () => {
-          modal.style.display = "none";
-        });
-      }
-    });
-
-    // Close modal when clicking outside
-    window.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        modal.style.display = "none";
-      }
-    });
-
-    // Bind delete buttons
-    this.bindDeleteButtons();
-  }
-
+  // Public method called by the onclick attribute in the PHP view
   changePage(page) {
-    console.log("changePage called with page:", page);
-    this.updateFilters({ page: page });
-  }
-
-  updatePageSize(newSize) {
-    console.log("updatePageSize called with size:", newSize);
-    this.updateFilters({ limit: newSize, page: 1 });
+    if (page === this.currentFilters.page) return;
+    this.updateStateAndNavigate({ page: page });
   }
 }
 
-// Initialize when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("DOM loaded, initializing AssetListManager...");
+  // This makes the object available globally for the inline `onclick` attributes
   window.AssetListManager = new AssetListManager();
-  console.log("AssetListManager initialized successfully");
 
   // Alert close functionality
-  const alerts = document.querySelectorAll(".alert");
-  alerts.forEach((alert) => {
-    const closeBtn = alert.querySelector(".closebtn");
-    if (closeBtn) {
-      closeBtn.addEventListener("click", () => {
-        alert.style.display = "none";
-      });
-    }
+  document.querySelectorAll(".alert .closebtn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.target.parentElement.style.display = "none";
+    });
   });
 });

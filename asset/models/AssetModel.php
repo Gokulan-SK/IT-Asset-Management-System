@@ -39,6 +39,30 @@ class AssetModel
         return $result;
     }
 
+    public static function getAvailableAssets(mysqli $conn): array
+    {
+        try {
+            // Select only the ID and name, filter by 'available' status, and order alphabetically.
+            $query = "SELECT asset_id, name AS asset_name 
+                    FROM asset 
+                    WHERE asset_status IN ('in_storage', 'active')
+                    ORDER BY name ASC";
+
+            $result = $conn->query($query);
+
+            if ($result) {
+                $data = $result->fetch_all(MYSQLI_ASSOC);
+                return $data;
+            }
+
+            return [];
+
+        } catch (Exception $e) {
+            error_log("AssetModel::getAvailableAssets Error:" . $e->getMessage());
+            return []; // Always return an array, even on failure
+        }
+    }
+
     public static function getAssetById(mysqli $conn, $asset_id): array|bool
     {
         try {

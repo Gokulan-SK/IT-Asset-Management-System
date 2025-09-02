@@ -12,6 +12,7 @@ $search = $search ?? '';
 $filter = $filter ?? '';
 $sort = $sort ?? 'emp_id';
 $order = $order ?? 'ASC';
+$limit = $limit ?? 10; // Added this for the page size selector
 ?>
 <div class="content-frame">
   <div class="table-container">
@@ -173,27 +174,81 @@ $order = $order ?? 'ASC';
         </div>
       <?php endif; ?>
       <div class="pagination">
-        <span>
-          <?php
-          $limit = 10;
-          $offset = ($currentPage - 1) * $limit;
-
-          if ($totalRecordsCount === 0) {
-            echo "0-0 of 0";
-          } else {
-            $from = $offset + 1;
-            $to = min($offset + $limit, $totalRecordsCount);
-            echo "$from-$to of $totalRecordsCount";
-          }
-          ?>
-        </span>
-        <div class="pagination-buttons">
-          <button class="<?= $currentPage <= 1 ? 'btn disabled' : 'btn-primary' ?>" <?php echo ($currentPage <= 1 ? 'disabled' : '') ?> onclick="navigateToPage(<?= $currentPage - 1 ?>)">
+        <div class="pagination-info">
+          <span class="records-info">
+            <?php
+            if ($totalRecordsCount === 0) {
+              echo "0-0 of 0";
+            } else {
+              $from = (($currentPage - 1) * $limit) + 1;
+              $to = min($currentPage * $limit, $totalRecordsCount);
+              echo "$from-$to of $totalRecordsCount";
+            }
+            ?>
+          </span>
+          <div class="page-size-selector">
+            <label for="page-size">Show:</label>
+            <select id="page-size" name="limit">
+              <option value="10" <?= $limit == 10 ? 'selected' : '' ?>>10</option>
+              <option value="25" <?= $limit == 25 ? 'selected' : '' ?>>25</option>
+              <option value="50" <?= $limit == 50 ? 'selected' : '' ?>>50</option>
+              <option value="100" <?= $limit == 100 ? 'selected' : '' ?>>100</option>
+            </select>
+            <span>per page</span>
+          </div>
+        </div> 
+        
+        <div class="pagination-controls">
+          <div class="page-info">
+            Page <?= $currentPage ?> of <?= $totalPages ?>
+          </div>
+          <div class="pagination-buttons">
+            <button 
+            class="<?= $currentPage <= 1 ? 'btn disabled' : 'btn-primary' ?>" 
+            <?= $currentPage <= 1 ? 'disabled' : '' ?> 
+            onclick="window.employeeListManager && window.employeeListManager.changePage(<?= $currentPage - 1 ?>)"
+            title="Previous page">
             ← Previous
           </button>
-          <button class="<?= $currentPage >= $totalPages ? 'btn disabled' : 'btn-primary ' ?>" <?= $currentPage >= $totalPages ? 'disabled' : '' ?> onclick="navigateToPage(<?= $currentPage + 1 ?>)">
-            Next →
-          </button>
+            
+            <div class="page-numbers">
+              <?php
+              $start = max(1, $currentPage - 2);
+              $end = min($totalPages, $currentPage + 2);
+              
+              if ($start > 1): ?>
+                <button 
+                  class="btn-page <?= $currentPage == 1 ? 'active' : '' ?>" 
+                  onclick="window.employeeListManager && window.employeeListManager.changePage(1)">1</button>
+                <?php if ($start > 2): ?>
+                  <span class="pagination-ellipsis">...</span>
+                <?php endif;
+              endif;
+              
+              for ($i = $start; $i <= $end; $i++): ?>
+                <button 
+                  class="btn-page <?= $currentPage == $i ? 'active' : '' ?>" 
+                  onclick="window.employeeListManager && window.employeeListManager.changePage(<?= $i ?>)"><?= $i ?></button>
+              <?php endfor;
+              
+              if ($end < $totalPages): 
+                if ($end < $totalPages - 1): ?>
+                  <span class="pagination-ellipsis">...</span>
+                <?php endif; ?>
+                <button 
+                  class="btn-page <?= $currentPage == $totalPages ? 'active' : '' ?>" 
+                  onclick="window.employeeListManager && window.employeeListManager.changePage(<?= $totalPages ?>)"><?= $totalPages ?></button>
+              <?php endif; ?>
+            </div>
+            
+            <button 
+              class="<?= $currentPage >= $totalPages ? 'btn disabled' : 'btn-primary' ?>" 
+              <?= $currentPage >= $totalPages ? 'disabled' : '' ?> 
+              onclick="window.employeeListManager && window.employeeListManager.changePage(<?= $currentPage + 1 ?>)"
+              title="Next page">
+              Next →
+            </button>
+          </div>
         </div>
       </div>
     </div>

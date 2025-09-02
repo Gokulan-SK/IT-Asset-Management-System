@@ -37,13 +37,37 @@ class EmployeeModel
         }
     }
 
+    public static function getAllEmployees(mysqli $conn): array
+    {
+        try {
+            // Select ID and names, filter out soft-deleted employees, and order alphabetically.
+            $query = "SELECT emp_id, concat(first_name, ' ', last_name) as full_name
+                      FROM employee 
+                      WHERE is_deleted = 0 
+                      ORDER BY first_name ASC, last_name ASC";
+
+            $result = $conn->query($query);
+
+            if ($result) {
+                $data = $result->fetch_all(MYSQLI_ASSOC);
+                return $data;
+            }
+
+            return [];
+
+        } catch (Exception $e) {
+            error_log("EmployeeModel::getAllEmployees Error:" . $e->getMessage());
+            return []; // Always return an array, even on failure
+        }
+    }
+
     public static function getEmployeeCount(mysqli $conn, string $search = '', string $filter = '')
     {
         try {
             $query = "SELECT COUNT(emp_id) as total FROM employee WHERE is_deleted = 0";
             $params = [];
             $types = "";
-            
+
             // Add search condition
             if (!empty($search)) {
                 $query .= " AND (first_name LIKE ? OR last_name LIKE ? OR email LIKE ? OR phone LIKE ? OR username LIKE ? OR designation LIKE ?)";
@@ -51,7 +75,7 @@ class EmployeeModel
                 $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm]);
                 $types .= "ssssss";
             }
-            
+
             // Add filter condition
             if (!empty($filter) && $filter !== 'all') {
                 $query .= " AND designation LIKE ?";
@@ -59,7 +83,7 @@ class EmployeeModel
                 $params[] = $filterTerm;
                 $types .= "s";
             }
-            
+
             if (empty($params)) {
                 $result = $conn->query($query);
             } else {
@@ -68,7 +92,7 @@ class EmployeeModel
                 $stmt->execute();
                 $result = $stmt->get_result();
             }
-            
+
             if ($result && $row = $result->fetch_assoc()) {
                 return (int) $row["total"];
             }
@@ -110,19 +134,19 @@ class EmployeeModel
             // Validate sort parameters
             $allowedSortColumns = ['emp_id', 'first_name', 'last_name', 'designation', 'phone', 'email'];
             $allowedSortOrders = ['ASC', 'DESC'];
-            
+
             if (!in_array($sortBy, $allowedSortColumns)) {
                 $sortBy = 'emp_id';
             }
-            
+
             if (!in_array(strtoupper($sortOrder), $allowedSortOrders)) {
                 $sortOrder = 'ASC';
             }
-            
+
             $query = "SELECT emp_id, first_name, last_name, designation, phone, email FROM employee WHERE is_deleted = 0";
             $params = [];
             $types = "";
-            
+
             // Add search condition
             if (!empty($search)) {
                 $query .= " AND (first_name LIKE ? OR last_name LIKE ? OR email LIKE ? OR phone LIKE ? OR username LIKE ? OR designation LIKE ?)";
@@ -130,7 +154,7 @@ class EmployeeModel
                 $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm]);
                 $types .= "ssssss";
             }
-            
+
             // Add filter condition
             if (!empty($filter) && $filter !== 'all') {
                 $query .= " AND designation LIKE ?";
@@ -138,13 +162,13 @@ class EmployeeModel
                 $params[] = $filterTerm;
                 $types .= "s";
             }
-            
+
             // Add sorting and pagination
             $query .= " ORDER BY $sortBy $sortOrder LIMIT ? OFFSET ?";
             $params[] = $limit;
             $params[] = $offset;
             $types .= "ii";
-            
+
             $stmt = $conn->prepare($query);
             $stmt->bind_param($types, ...$params);
             $stmt->execute();
@@ -171,7 +195,7 @@ class EmployeeModel
             $updateFields = [];
             $types = "";
             $values = [];
-            
+
             if (isset($data["username"])) {
                 $updateFields[] = "username = ?";
                 $types .= "s";
@@ -217,33 +241,33 @@ class EmployeeModel
                 $types .= "s";
                 $values[] = $data["passwordHash"];
             }
-            
+
             if (empty($updateFields)) {
                 error_log("EmployeeModel::updateEmployee Error: No fields to update");
                 return false;
             }
-            
+
             $query = "UPDATE employee SET " . implode(", ", $updateFields) . " WHERE emp_id = ?";
             $types .= "i";
             $values[] = $id;
-            
+
             $stmt = $conn->prepare($query);
             if (!$stmt) {
                 throw new Exception($conn->error);
             }
-            
+
             $stmt->bind_param($types, ...$values);
             $stmt->execute();
-            
+
             if ($stmt->error) {
                 error_log("EmployeeModel::updateEmployee Error:" . $stmt->error);
                 $stmt->close();
                 return false;
             }
-            
+
             $affectedRows = $stmt->affected_rows;
             $stmt->close();
-            
+
             return $affectedRows > 0;
         } catch (Exception $e) {
             error_log("EmployeeModel::updateEmployee Error:" . $e->getMessage());
@@ -261,19 +285,19 @@ class EmployeeModel
                 error_log("EmployeeModel::deleteEmployee Error preparing statement: " . $conn->error);
                 return false;
             }
-            
+
             $stmt->bind_param("i", $id);
             $stmt->execute();
-            
+
             if ($stmt->error) {
                 error_log("EmployeeModel::deleteEmployee Error executing: " . $stmt->error);
                 $stmt->close();
                 return false;
             }
-            
+
             $affectedRows = $stmt->affected_rows;
             $stmt->close();
-            
+
             return $affectedRows > 0;
         } catch (Exception $e) {
             error_log("EmployeeModel::deleteEmployee Error:" . $e->getMessage());
@@ -288,25 +312,25 @@ class EmployeeModel
     {
         try {
             $query = "UPDATE employee SET is_deleted = 0, deleted_at = NULL WHERE emp_id = ? AND is_deleted = 1";
-            
+
             $stmt = $conn->prepare($query);
             if (!$stmt) {
                 error_log("EmployeeModel::restoreEmployee Error preparing statement: " . $conn->error);
                 return false;
             }
-            
+
             $stmt->bind_param("i", $id);
             $stmt->execute();
-            
+
             if ($stmt->error) {
                 error_log("EmployeeModel::restoreEmployee Error executing: " . $stmt->error);
                 $stmt->close();
                 return false;
             }
-            
+
             $affectedRows = $stmt->affected_rows;
             $stmt->close();
-            
+
             return $affectedRows > 0;
         } catch (Exception $e) {
             error_log("EmployeeModel::restoreEmployee Error:" . $e->getMessage());
@@ -322,12 +346,12 @@ class EmployeeModel
         try {
             $query = "SELECT DISTINCT designation FROM employee WHERE is_deleted = 0 ORDER BY designation";
             $result = $conn->query($query);
-            
+
             $designations = [];
             while ($row = $result->fetch_assoc()) {
                 $designations[] = $row['designation'];
             }
-            
+
             return $designations;
         } catch (Exception $e) {
             error_log("EmployeeModel::getUniqueDesignations Error:" . $e->getMessage());
@@ -348,41 +372,41 @@ class EmployeeModel
             while ($col = $columnsResult->fetch_assoc()) {
                 $availableColumns[] = $col['Field'];
             }
-            
+
             // Build SELECT clause with only available columns
             $selectFields = [];
             $desiredFields = ['emp_id', 'username', 'first_name', 'last_name', 'email', 'phone', 'dob', 'designation', 'is_admin'];
-            
+
             foreach ($desiredFields as $field) {
                 if (in_array($field, $availableColumns)) {
                     $selectFields[] = $field;
                 }
             }
-            
+
             // Add created_at if available, otherwise use a default
             if (in_array('created_at', $availableColumns)) {
                 $selectFields[] = 'created_at';
             } else {
                 $selectFields[] = "NULL as created_at";
             }
-            
+
             $query = "SELECT " . implode(', ', $selectFields) . " FROM employee WHERE ";
-            
+
             // Check if is_deleted column exists
             if (in_array('is_deleted', $availableColumns)) {
                 $query .= "is_deleted = 0";
             } else {
                 $query .= "1=1"; // Always true condition if no soft delete
             }
-            
+
             $params = [];
             $types = "";
-            
+
             // Add search condition
             if (!empty($search)) {
                 $searchConditions = [];
                 $searchFields = ['first_name', 'last_name', 'email', 'phone', 'username', 'designation'];
-                
+
                 foreach ($searchFields as $field) {
                     if (in_array($field, $availableColumns)) {
                         $searchConditions[] = "$field LIKE ?";
@@ -391,12 +415,12 @@ class EmployeeModel
                         $types .= "s";
                     }
                 }
-                
+
                 if (!empty($searchConditions)) {
                     $query .= " AND (" . implode(' OR ', $searchConditions) . ")";
                 }
             }
-            
+
             // Add filter condition
             if (!empty($filter) && $filter !== 'all' && in_array('designation', $availableColumns)) {
                 $query .= " AND designation LIKE ?";
@@ -404,12 +428,12 @@ class EmployeeModel
                 $params[] = $filterTerm;
                 $types .= "s";
             }
-            
+
             $query .= " ORDER BY emp_id";
-            
+
             error_log("Export query: " . $query);
             error_log("Export params: " . print_r($params, true));
-            
+
             if (empty($params)) {
                 $result = $conn->query($query);
             } else {
@@ -421,11 +445,11 @@ class EmployeeModel
                 $stmt->execute();
                 $result = $stmt->get_result();
             }
-            
+
             if (!$result) {
                 throw new Exception("Query failed: " . $conn->error);
             }
-            
+
             $employees = [];
             while ($row = $result->fetch_assoc()) {
                 // Ensure all expected fields exist with defaults
@@ -443,10 +467,10 @@ class EmployeeModel
                 ];
                 $employees[] = $employee;
             }
-            
+
             error_log("Export employees count: " . count($employees));
             return $employees;
-            
+
         } catch (Exception $e) {
             error_log("EmployeeModel::exportEmployees Error:" . $e->getMessage());
             error_log("Stack trace: " . $e->getTraceAsString());

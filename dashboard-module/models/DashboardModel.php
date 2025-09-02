@@ -14,23 +14,23 @@ class DashboardModel
                     $existingStatuses[] = $row['asset_status'];
                 }
             }
-            
+
             $query = "SELECT 
                         COUNT(*) as total_assets,
                         SUM(CASE 
-                            WHEN asset_status IN ('available', 'in_storage', 'active') THEN 1 
+                            WHEN asset_status IN ('in_storage', 'active') THEN 1 
                             ELSE 0 
                         END) as available_assets,
                         SUM(CASE 
-                            WHEN asset_status IN ('in_use', 'in-use', 'allocated') THEN 1 
+                            WHEN asset_status = 'in_use' THEN 1 
                             ELSE 0 
                         END) as in_use_assets,
                         SUM(CASE 
-                            WHEN asset_status IN ('maintenance', 'under_repair', 'needs_repair', 'repair') THEN 1 
+                            WHEN asset_status = 'under_repair' THEN 1 
                             ELSE 0 
                         END) as maintenance_assets,
                         SUM(CASE 
-                            WHEN asset_status IN ('retired', 'disposed', 'expired', 'revoked', 'inactive', 'decommissioned') THEN 1 
+                            WHEN asset_status IN ('retired', 'disposed', 'expired', 'inactive', 'decommissioned') THEN 1 
                             ELSE 0 
                         END) as retired_assets
                       FROM asset 
@@ -102,7 +102,7 @@ class DashboardModel
     public static function getAssetsByCondition(mysqli $conn): array
     {
         try {
-            $query = "SELECT asset_condition as condition, COUNT(*) as count 
+            $query = "SELECT asset_condition, COUNT(*) as count 
                       FROM asset 
                       WHERE is_deleted = 0 
                       GROUP BY asset_condition 
@@ -196,8 +196,7 @@ class DashboardModel
                         COUNT(*) as total_allocations,
                         SUM(CASE WHEN check_in_date IS NULL THEN 1 ELSE 0 END) as active_allocations,
                         SUM(CASE WHEN check_in_date IS NOT NULL THEN 1 ELSE 0 END) as returned_allocations
-                      FROM asset_ledger 
-                      WHERE is_deleted = 0";
+                      FROM asset_ledger";
 
             $result = $conn->query($query);
             if ($result) {
@@ -225,7 +224,7 @@ class DashboardModel
                       FROM asset_ledger al
                       JOIN asset a ON al.asset_id = a.asset_id
                       JOIN employee e ON al.emp_id = e.emp_id
-                      WHERE al.is_deleted = 0 AND a.is_deleted = 0 AND e.is_deleted = 0
+                      WHERE a.is_deleted = 0 AND e.is_deleted = 0
                       ORDER BY 
                         CASE 
                             WHEN al.check_in_date IS NULL THEN al.check_out_date
@@ -259,9 +258,9 @@ class DashboardModel
                         a.name as asset_name,
                         a.category,
                         COUNT(al.asset_id) as allocation_count,
-                        MAX(al.check_out_date) as last_allocated
+                        MAX(al.check_out_date) as last_allocated, a.unit_price
                       FROM asset a
-                      LEFT JOIN asset_ledger al ON a.asset_id = al.asset_id AND al.is_deleted = 0
+                      LEFT JOIN asset_ledger al ON a.asset_id = al.asset_id
                       WHERE a.is_deleted = 0
                       GROUP BY a.asset_id, a.name, a.category
                       ORDER BY allocation_count DESC, last_allocated DESC
@@ -324,8 +323,7 @@ class DashboardModel
                         DATE_FORMAT(check_out_date, '%Y-%m') as month,
                         COUNT(*) as allocations
                       FROM asset_ledger 
-                      WHERE is_deleted = 0 
-                        AND check_out_date >= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
+                      WHERE check_out_date >= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
                       GROUP BY DATE_FORMAT(check_out_date, '%Y-%m')
                       ORDER BY month ASC";
 
@@ -353,7 +351,7 @@ class DashboardModel
     {
         try {
             $query = "SELECT 
-                        (SELECT COUNT(*) FROM asset WHERE is_deleted = 0) as total_assets,
+                        (SELECT COUNT(*) FROM asset WHERE is_deleted = 0 AND asset_status = 'in_use') as total_assets,
                         (SELECT COUNT(*) FROM asset WHERE is_deleted = 0 AND asset_status = 'in_use') as assets_in_use,
                         ROUND(
                             (SELECT COUNT(*) FROM asset WHERE is_deleted = 0 AND asset_status = 'in_use') * 100.0 / 
@@ -420,7 +418,7 @@ class DashboardModel
                         COUNT(DISTINCT a.asset_id) as assets_in_category,
                         ROUND(COUNT(al.asset_id) / COUNT(DISTINCT a.asset_id), 1) as avg_allocations_per_asset
                       FROM asset a
-                      LEFT JOIN asset_ledger al ON a.asset_id = al.asset_id AND al.is_deleted = 0
+                      LEFT JOIN asset_ledger al ON a.asset_id = al.asset_id
                       WHERE a.is_deleted = 0
                       GROUP BY a.category
                       HAVING COUNT(al.asset_id) > 0
